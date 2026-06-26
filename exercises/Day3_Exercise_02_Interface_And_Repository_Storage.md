@@ -164,13 +164,13 @@ InMemoryCourseRepository.java
 
 ## Submission checklist
 
-- [ ] `RepositoryPractice.java` exists.
-- [ ] You used `CourseRepository courseRepository = new InMemoryCourseRepository();`.
-- [ ] You saved at least three courses through the repository.
-- [ ] You printed all courses using a loop.
-- [ ] You used `Optional<Course>` when finding by ID.
-- [ ] You used `existsById()`.
-- [ ] Code compiles and runs.
+- [/] `RepositoryPractice.java` exists.
+- [/] You used `CourseRepository courseRepository = new InMemoryCourseRepository();`.
+- [/] You saved at least three courses through the repository.
+- [/] You printed all courses using a loop.
+- [/] You used `Optional<Course>` when finding by ID.
+- [/] You used `existsById()`.
+- [/] Code compiles and runs.
 
 ## README reflection
 
@@ -178,5 +178,14 @@ Answer:
 
 ```text
 Why is InMemoryCourseRepository temporary storage?
+= It stores data in a plain Java List (or Map) held in memory. When the program stops, everything is gone — there's no persistence to disk or a database.
+
 What would probably replace it later when we use MongoDB?
+
+```
+```java
+
+public interface CourseRepository extends MongoRepository<Course, String> {
+    // Spring generates the implementation automatically
+}
 ```

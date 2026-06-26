@@ -124,13 +124,13 @@ The service should throw the exception. The demo class should catch and display 
 
 ## Submission checklist
 
-- [ ] `ExceptionPractice.java` exists.
-- [ ] You created `CourseService` correctly.
-- [ ] You added at least two courses.
-- [ ] You successfully printed one existing course.
-- [ ] You handled `C999` using `try/catch`.
-- [ ] You handled another missing course ID using `try/catch`.
-- [ ] Program does not crash.
+- [/] `ExceptionPractice.java` exists.
+- [/] You created `CourseService` correctly.
+- [/] You added at least two courses.
+- [/] You successfully printed one existing course.
+- [/] You handled `C999` using `try/catch`.
+- [/] You handled another missing course ID using `try/catch`.
+- [/] Program does not crash.
 
 ## README reflection
 
@@ -138,6 +138,8 @@ Answer:
 
 ```text
 Why is throwing CourseNotFoundException better than printing inside CourseService?
+= By throwing the CourseNotFoundException, it decrease the risk of silently continue with a null value.
+ The exception will throw a Exception message so that the user know the problem
 ```
 
 Use this hint:

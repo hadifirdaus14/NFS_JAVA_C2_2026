@@ -167,7 +167,7 @@ private Instructor instructor;
 
 ## Submission checklist
 
-- [ ] You created two instructors.
+- [/] You created two instructors.
 - [ ] You created two courses.
 - [ ] You assigned instructors to courses.
 - [ ] You created two course offerings.

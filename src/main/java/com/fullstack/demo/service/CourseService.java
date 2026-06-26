@@ -6,7 +6,6 @@ import com.fullstack.demo.exception.InvalidCourseException;
 import com.fullstack.demo.model.Course;
 import com.fullstack.demo.model.Instructor;
 import com.fullstack.demo.repository.CourseRepository;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -138,5 +137,18 @@ public class CourseService {
 
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
+    }
+
+    public List<Course> searchByLevelUsingLoop(String level){
+        String safeLevel = level == null ? "" : level.trim();
+        
+        List<Course> results = new ArrayList<>();
+
+        for (Course course : courseRepository.findAll()) {
+            if (course.getLevel().equalsIgnoreCase(safeLevel)) {
+                results.add(course);
+            }
+        }
+        return results;
     }
 }

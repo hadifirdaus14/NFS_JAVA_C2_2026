@@ -6,9 +6,9 @@ public class Student {
     private String email;
 
     public Student(String studentId, String studentName, String email) {
-        setStudentId(studentId);
-        setStudentName(studentName);
-        setEmail(email);
+        this.studentId = studentId;
+        this.studentName = studentName;
+        this.email = email;
     }
 
     public String getStudentId() {

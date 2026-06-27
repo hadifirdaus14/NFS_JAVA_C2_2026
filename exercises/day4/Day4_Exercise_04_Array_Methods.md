@@ -2,7 +2,7 @@
 
 ## What You Just Learned
 
-The trainer showed several common JavaScript array methods using course data.
+The instructor showed several common JavaScript array methods using course data.
 
 In this exercise, you will practise **8 JavaScript array methods** using student data:
 

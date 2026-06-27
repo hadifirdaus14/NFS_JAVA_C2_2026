@@ -398,8 +398,20 @@ Answer the following questions in your README:
 
 ```text
 1. What is the difference between filter, find, and map?
+  = filter is used when creating a new array with a specified object
+    find is used when searching for a specified object
+    map is used to gather one object into one array
+
 2. Which four array methods change the original array?
+  = pop, push, unshift, shift
+
 3. What does push return?
+  = return a new set of data at the end or the array
+
 4. What does pop return?
+  = removed the data at the end of the array
+
 5. What is the difference between shift and unshift?
+  = shift is used to removed data at the start of an array, while
+    unshift is used to add data at the start of an array
 ```

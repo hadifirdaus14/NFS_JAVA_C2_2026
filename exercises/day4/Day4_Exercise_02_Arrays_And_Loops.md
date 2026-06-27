@@ -67,4 +67,5 @@ Answer:
 
 ```text
 How is a JavaScript array similar to Java ArrayList?
+= the use of [] bracket 
 ```

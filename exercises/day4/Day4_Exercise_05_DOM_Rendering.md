@@ -75,4 +75,5 @@ Answer:
 
 ```text
 What does the DOM allow JavaScript to do?
+= its a bridge between HTML and Javascript
 ```

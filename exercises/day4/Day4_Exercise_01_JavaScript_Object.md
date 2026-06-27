@@ -74,4 +74,6 @@ Answer:
 
 ```text
 What is one difference between a Java object and a JavaScript object?
+= Java object needs class to be instantiate, 
+while Javascript objects dont need class to be instantiate
 ```

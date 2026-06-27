@@ -602,8 +602,17 @@ Answer the following questions:
 
 ```text
 1. What does async mean?
+  = async means that a function that will handle asyncronous operation(task that needs time to execute)
+
 2. What does await do?
+  = wait for the response from the request
+
 3. What does fetch do?
+  = fetch the data needed from another file
+
 4. Why do we use fetch before connecting to a real backend API?
+  = to get familiar with the way to connect to the real backend API later
+
 5. Why should this exercise be run using Live Server?
+  = because if we open directly from the folder, the browser might block the other file needed for the website
 ```

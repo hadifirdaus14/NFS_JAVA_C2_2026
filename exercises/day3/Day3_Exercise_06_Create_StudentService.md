@@ -1,4 +1,4 @@
-# Day 3 Assignment 06 - Build StudentService Using the Same Pattern as CourseService
+# Day 3 Exercise 06 - Build StudentService Using the Same Pattern as CourseService
 
 ## Why you are doing this
 
@@ -236,7 +236,7 @@ Requirements:
 ## File to create
 
 ```text
-src/main/java/com/fullstack/demo/Day3_Assignment06_StudentServicePractice.java
+src/main/java/com/fullstack/demo/Day3_Exercise06_StudentServicePractice.java
 ```
 
 ## Demo requirements

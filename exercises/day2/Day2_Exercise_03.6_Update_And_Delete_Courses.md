@@ -1,4 +1,4 @@
-# Day 2 Assignment 03.6 - Update and Delete Courses
+# Day 2 Exercise 03.6 - Update and Delete Courses
 
 ## Goal
 

@@ -1,4 +1,4 @@
-# Day 2 Assignment 03.4 - Search and Filter Courses
+# Day 2 Exercise 03.4 - Search and Filter Courses
 
 ## Goal
 

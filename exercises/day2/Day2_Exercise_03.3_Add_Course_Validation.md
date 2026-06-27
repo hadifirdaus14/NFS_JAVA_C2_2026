@@ -1,4 +1,4 @@
-# Day 2 Assignment 03.3 - Add Course Validation
+# Day 2 Exercise 03.3 - Add Course Validation
 
 ## Goal
 

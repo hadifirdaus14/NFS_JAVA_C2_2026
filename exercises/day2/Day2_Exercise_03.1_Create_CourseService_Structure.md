@@ -1,4 +1,4 @@
-# Day 2 Assignment 03.1 - Create the CourseService Structure
+# Day 2 Exercise 03.1 - Create the CourseService Structure
 
 ## Goal
 

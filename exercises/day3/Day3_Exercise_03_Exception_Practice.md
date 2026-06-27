@@ -1,4 +1,4 @@
-# Day 3 Assignment 03 - Exception Practice with CourseService
+# Day 3 Exercise 03 - Exception Practice with CourseService
 
 ## Why you are doing this
 

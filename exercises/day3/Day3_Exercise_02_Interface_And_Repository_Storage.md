@@ -1,4 +1,4 @@
-# Day 3 Assignment 02 - Interface and Repository Storage Practice
+# Day 3 Exercise 02 - Interface and Repository Storage Practice
 
 ## Why you are doing this
 
@@ -11,7 +11,7 @@ InMemoryCourseRepository.java
 
 instead of just one repository class.
 
-This assignment helps you see the difference between:
+This Exercise helps you see the difference between:
 
 ```text
 Interface       = what actions are available

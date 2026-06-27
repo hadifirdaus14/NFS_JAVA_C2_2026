@@ -1,4 +1,4 @@
-# Day 2 Assignment 03.5 - Assign Instructor and Search by Instructor
+# Day 2 Exercise 03.5 - Assign Instructor and Search by Instructor
 
 ## Goal
 
@@ -17,7 +17,7 @@ CourseRepository.java
 CourseService.java
 ```
 
-Your `Course` class should support instructor assignment using methods similar to:
+Your `Course` class should support instructor Exercise using methods similar to:
 
 ```java
 setInstructor(Instructor instructor)

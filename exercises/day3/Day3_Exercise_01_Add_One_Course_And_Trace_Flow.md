@@ -1,4 +1,4 @@
-# Day 3 Assignment 01 - Build and Trace the Code Flow
+# Day 3 Exercise 01 - Build and Trace the Code Flow
 
 ## Why you are doing this
 
@@ -11,7 +11,7 @@ service     -> controls business actions
 exception   -> handles error situations
 ```
 
-This assignment helps you understand how one simple action moves through the files.
+This Exercise helps you understand how one simple action moves through the files.
 
 The main idea is:
 
@@ -92,7 +92,7 @@ Then save it using:
 courseService.createCourse(...);
 ```
 
-Do not save it directly using the repository for this assignment.
+Do not save it directly using the repository for this Exercise.
 
 ## Task C - Retrieve the course by ID
 
@@ -147,7 +147,7 @@ Course course = courseRepository.findById("C004");
 
 `findById()` returns an `Optional<Course>`, not a direct `Course`.
 
-For this assignment, use the service:
+For this Exercise, use the service:
 
 ```java
 Course course = courseService.getCourseById("C004");

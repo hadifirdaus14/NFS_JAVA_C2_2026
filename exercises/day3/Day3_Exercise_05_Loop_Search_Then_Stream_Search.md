@@ -1,4 +1,4 @@
-# Day 3 Assignment 05 - Write Search Using Loop, Then Compare with Stream
+# Day 3 Exercise 05 - Write Search Using Loop, Then Compare with Stream
 
 ## Why you are doing this
 
@@ -8,7 +8,7 @@ That is normal.
 
 A stream is easier to understand after you first write the normal loop version.
 
-This assignment focuses on this idea:
+This Exercise focuses on this idea:
 
 ```text
 Loop version first

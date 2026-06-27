@@ -1,4 +1,4 @@
-# Day 3 Assignment 04 - Object Relationships and Composition
+# Day 3 Exercise 04 - Object Relationships and Composition
 
 ## Why you are doing this
 
@@ -20,7 +20,7 @@ CourseOffering has a Course
 CourseOffering has an Instructor
 ```
 
-This assignment makes you write those relationships in code.
+This Exercise makes you write those relationships in code.
 
 ## What you will write
 

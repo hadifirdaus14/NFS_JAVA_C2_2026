@@ -1,4 +1,4 @@
-# Day 2 Assignment 01 - Clean Up the Model Classes
+# Day 2 Exercise 01 - Clean Up the Model Classes
 
 ## Goal
 

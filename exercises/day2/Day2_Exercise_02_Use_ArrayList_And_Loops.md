@@ -1,4 +1,4 @@
-# Day 2 Assignment 02 - Use ArrayList and Loops
+# Day 2 Exercise 02 - Use ArrayList and Loops
 
 ## Goal
 
@@ -86,7 +86,7 @@ Do the same for:
 
 Do not use update, delete, or advanced filter yet.
 
-This assignment is only about:
+This Exercise is only about:
 
 ```text
 ArrayList

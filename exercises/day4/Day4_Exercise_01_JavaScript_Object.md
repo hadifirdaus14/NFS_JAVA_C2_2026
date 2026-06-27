@@ -1,4 +1,4 @@
-# D4 Exercise 01 - Create a JavaScript Student Object
+# Day 4 Exercise 01 - Create a JavaScript Student Object
 
 ## What You Just Learned
 

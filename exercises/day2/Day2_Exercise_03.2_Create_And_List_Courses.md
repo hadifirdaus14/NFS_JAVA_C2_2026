@@ -1,4 +1,4 @@
-# Day 2 Assignment 03.2 - Create and List Courses
+# Day 2 Exercise 03.2 - Create and List Courses
 
 ## Goal
 

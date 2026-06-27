@@ -91,4 +91,5 @@ Answer:
 
 ```text
 Why are arrow functions important before learning React?
+= because in React, devs often uses it for arrays, and callbacks.
 ```

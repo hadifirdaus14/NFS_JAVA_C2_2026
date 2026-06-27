@@ -87,4 +87,5 @@ Answer:
 
 ```text
 How is JavaScript filter used in a search feature?
+= it filters based on the input of the users
 ```

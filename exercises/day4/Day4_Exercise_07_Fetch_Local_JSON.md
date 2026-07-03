@@ -1,36 +1,5 @@
 # Day 4 Exercise 07 - Load Students from a JSON File Using Fetch
 
-## What You Just Learned
-
-The trainer showed how JavaScript can load data from an external file using:
-
-```text
-fetch
-async
-await
-try/catch
-```
-
-Until now, most of your data was written directly inside your JavaScript file.
-
-In this exercise, your student data will be stored separately inside a JSON file.
-
-Your JavaScript file will then load the student data from that JSON file and display it on the webpage.
-
----
-
-## Why Are We Learning This?
-
-In real full-stack applications, frontend data usually does not stay inside the JavaScript file.
-
-The frontend normally loads data from somewhere else, such as:
-
-```text
-JSON file
-Backend API
-Database through an API
-```
-
 Today, you will load data from:
 
 ```javascript

@@ -1,4 +1,4 @@
-package com.example.AssetTracker.controller;
+package com.example.supportdesk.controller;
 
 import java.util.Map;
 
@@ -12,8 +12,18 @@ public class HealthController {
     public Map<String, String> health() {
         return Map.of(
             "status", "UP",
-            "service", "asset-tracker-api"
+            "service", "support-desk-api"
         );
     }
+
+    @GetMapping("/api/about")
+    public Map<String, String> about() {
+        return Map.of(
+            "appName", "Support Desk API",
+            "version", "1.0.0",
+            "description", "API for managing IT support tickets"
+        );
+    }
+
 
 }

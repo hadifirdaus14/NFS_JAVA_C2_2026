@@ -1,4 +1,4 @@
-package com.example.AssetTracker.controller;
+package com.example.assettracker.controller;
 
 import java.util.List;
 
@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.AssetTracker.dto.AssetResponse;
-import com.example.AssetTracker.service.AssetService;
+import com.example.assettracker.dto.AssetResponse;
+import com.example.assettracker.service.AssetService;
 
 @RestController
 @RequestMapping("/api/assets")

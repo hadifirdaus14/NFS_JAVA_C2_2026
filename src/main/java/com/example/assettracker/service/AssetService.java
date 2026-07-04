@@ -1,12 +1,12 @@
-package com.example.AssetTracker.service;
+package com.example.assettracker.service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.AssetTracker.dto.AssetResponse;
-import com.example.AssetTracker.exception.ResourceNotFoundException;
+import com.example.assettracker.dto.AssetResponse;
+import com.example.assettracker.exception.ResourceNotFoundException;
 
 @Service
 public class AssetService {

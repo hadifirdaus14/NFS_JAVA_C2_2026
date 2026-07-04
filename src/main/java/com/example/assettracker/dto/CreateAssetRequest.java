@@ -1,4 +1,4 @@
-package com.example.AssetTracker.dto;
+package com.example.assettracker.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

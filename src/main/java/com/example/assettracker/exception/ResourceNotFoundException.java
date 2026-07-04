@@ -1,4 +1,4 @@
-package com.example.AssetTracker.exception;
+package com.example.assettracker.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {

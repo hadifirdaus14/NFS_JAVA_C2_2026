@@ -1,13 +1,13 @@
-package com.example.AssetTracker;
+package com.example.assettracker;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AssettrackerApplication {
+public class AssetTrackerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AssettrackerApplication.class, args);
+		SpringApplication.run(AssetTrackerApplication.class, args);
 	}
 
 }

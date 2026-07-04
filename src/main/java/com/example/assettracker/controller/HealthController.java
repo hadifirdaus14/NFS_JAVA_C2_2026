@@ -1,4 +1,4 @@
-package com.example.AssetTracker.controller;
+package com.example.assettracker.controller;
 
 import java.util.Map;
 

@@ -50,8 +50,8 @@ For each request, record the following information:
 
 | Method | URL | Status Code | Response Type | What Happened? |
 |---|---|---:|---|---|
-|  |  |  |  |  |
-
+| GET    | http://localhost:8081/api/health | 200 OK |  | the request is made to make sure the host is running |
+| GET    | http://localhost:8081/api/course-offerings | 200 OK |  | the req is made to fetch list from the course offering |
 ---
 
 ## Response Type Guide

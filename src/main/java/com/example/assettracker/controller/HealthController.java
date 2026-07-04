@@ -16,4 +16,13 @@ public class HealthController {
         );
     }
 
+
+    @GetMapping("/api/about")
+    public Map<String, String> about() {
+        return Map.of(
+            "name", "Asset Tracker API",
+            "version", "1.0.0",
+            "description", "API for tracking assets"
+        );
+    }
 }

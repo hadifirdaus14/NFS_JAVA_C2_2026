@@ -7,16 +7,13 @@ GET http://localhost:8080/api/about
 ### GET all tickets
 GET http://localhost:8080/api/tickets
 
-### Get one tickets
+### Get one existing ticket
 GET http://localhost:8080/api/tickets/T002
 
-### Get one tickets
-GET http://localhost:8080/api/tickets/T001
-
-### Get one missing tickets
+### Get one missing ticket
 GET http://localhost:8080/api/tickets/T999
 
-### create new ticket
+### create new valid ticket
 POST http://localhost:8080/api/tickets
 Content-Type: application/json
 
@@ -28,7 +25,7 @@ Content-Type: application/json
   "createdBy": "siti@example.com"
 }
 
-###Invalid create new ticket
+###create an invalid ticket
 POST http://localhost:8080/api/tickets
 Content-Type: application/json
 
@@ -39,3 +36,5 @@ Content-Type: application/json
   "priority": "",
   "createdBy": ""
 }
+
+###all endpoints are working fine.

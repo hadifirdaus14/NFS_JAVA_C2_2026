@@ -1,0 +1,11 @@
+### Health check
+GET http://localhost:8080/api/health
+
+### About check
+GET http://localhost:8080/api/about
+
+### GET all assets
+GET http://localhost:8080/api/tickets
+
+### Get one asset
+GET http://localhost:8080/api/tickets/T002

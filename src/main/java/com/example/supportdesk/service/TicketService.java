@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.supportdesk.dto.TicketResponse;
+import com.example.supportdesk.exception.ResourceNotFoundException;
 
 @Service
 public class TicketService {
@@ -54,7 +55,7 @@ public class TicketService {
         return tickets.stream()
                 .filter(ticket -> ticket.getId().equalsIgnoreCase(id))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Ticket " + id + " was not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket " + id + " was not found"));
     }
 
     private String generateTicketId() {

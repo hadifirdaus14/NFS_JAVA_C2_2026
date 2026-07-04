@@ -4,8 +4,14 @@ GET http://localhost:8080/api/health
 ### About check
 GET http://localhost:8080/api/about
 
-### GET all assets
+### GET all tickets
 GET http://localhost:8080/api/tickets
 
-### Get one asset
+### Get one tickets
 GET http://localhost:8080/api/tickets/T002
+
+### Get one tickets
+GET http://localhost:8080/api/tickets/T001
+
+### Get one missing tickets
+GET http://localhost:8080/api/tickets/T999

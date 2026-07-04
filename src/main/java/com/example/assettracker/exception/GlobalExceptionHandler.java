@@ -1,4 +1,4 @@
-package com.example.assettracker.exception;
+package com.example.AssetTracker.exception;
 
 public class GlobalExceptionHandler {
 

@@ -1,4 +1,4 @@
-package com.example.assettracker.controller;
+package com.example.AssetTracker.controller;
 
 public class HealthController {
 

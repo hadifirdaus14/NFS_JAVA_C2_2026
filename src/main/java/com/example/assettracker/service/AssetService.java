@@ -1,4 +1,4 @@
-package com.example.assettracker.service;
+package com.example.AssetTracker.service;
 
 public class AssetService {
 

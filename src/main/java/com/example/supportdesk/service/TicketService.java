@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.supportdesk.dto.CreateTicketRequest;
 import com.example.supportdesk.dto.TicketResponse;
 import com.example.supportdesk.exception.ResourceNotFoundException;
 
@@ -58,8 +59,24 @@ public class TicketService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket " + id + " was not found"));
     }
 
+    public TicketResponse createTicket(CreateTicketRequest request) {
+        TicketResponse newTicket = new TicketResponse(
+            generateTicketId(),
+            request.getTitle(),
+            request.getDescription(),
+            request.getCategory(),
+            request.getPriority(),
+            "OPEN", // Default status for new tickets
+            request.getCreatedBy(),
+            java.time.LocalDate.now().toString()
+        );
+        tickets.add(newTicket);
+        return newTicket;
+    }
+
     private String generateTicketId() {
         return "T" + String.format("%03d", tickets.size() + 1);
     }
 
+    
 }

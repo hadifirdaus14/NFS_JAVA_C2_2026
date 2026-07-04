@@ -15,3 +15,27 @@ GET http://localhost:8080/api/tickets/T001
 
 ### Get one missing tickets
 GET http://localhost:8080/api/tickets/T999
+
+### create new ticket
+POST http://localhost:8080/api/tickets
+Content-Type: application/json
+
+{
+  "title": "VPN connection not working",
+  "description": "User cannot connect to company VPN from home.",
+  "category": "Network",
+  "priority": "MEDIUM",
+  "createdBy": "siti@example.com"
+}
+
+###Invalid create new ticket
+POST http://localhost:8080/api/tickets
+Content-Type: application/json
+
+{
+  "title": "",
+  "description": "",
+  "category": "",
+  "priority": "",
+  "createdBy": ""
+}

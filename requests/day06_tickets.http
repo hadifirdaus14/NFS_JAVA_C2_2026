@@ -18,11 +18,11 @@ POST http://localhost:8080/api/tickets
 Content-Type: application/json
 
 {
-  "title": "VPN connection not working",
-  "description": "User cannot connect to company VPN from home.",
-  "category": "Network",
-  "priority": "MEDIUM",
-  "createdBy": "siti@example.com"
+  "title": "Cannot access email",
+  "description": "User cannot login to company email account.",
+  "category": "Email",
+  "priority": "HIGH",
+  "createdBy": "amir@example.com"
 }
 
 ###create an invalid ticket

@@ -1,0 +1,26 @@
+
+#### create new ticket
+POST http://localhost:8080/api/tickets
+Content-Type: application/json
+
+{
+  "title": "Cannot access email",
+  "description": "User cannot login to company email account.",
+  "category": "Email",
+  "priority": "HIGH",
+  "createdBy": "amir@example.com"
+}
+
+###Get all tickets
+GET http://localhost:8080/api/tickets
+
+
+### All endpoints are working fine.
+###exit mongo shell
+### stop the server
+
+###Get all tickets
+GET http://localhost:8080/api/tickets
+
+
+### id of the ticket created = 6a50afdff42045a2c3f46386

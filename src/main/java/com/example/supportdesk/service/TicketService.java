@@ -49,6 +49,7 @@ public class TicketService {
         newTicket.setPriority(request.getPriority());
         newTicket.setStatus("Open"); // Default status for new tickets
         newTicket.setCreatedBy(request.getCreatedBy());
+        newTicket.setCreatedAt(new java.util.Date().toString()); // Set the current date/time as a string
 
         // Save it to MongoDB! MongoDB will automatically generate the 'id'
         Ticket savedTicket = ticketRepository.save(newTicket);

@@ -125,3 +125,4 @@ private-notes/
 out/
 .generated/
 generated/
+.java-version # jenv

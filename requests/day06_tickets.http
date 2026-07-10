@@ -8,10 +8,10 @@ GET http://localhost:8080/api/about
 GET http://localhost:8080/api/tickets
 
 ### Get one existing ticket
-GET http://localhost:8080/api/tickets/T002
+GET http://localhost:8080/api/tickets/6a50650ad0e1026b90eb03bd
 
 ### Get one missing ticket
-GET http://localhost:8080/api/tickets/T999
+GET http://localhost:8080/api/tickets/000000000000000000000000
 
 ### create new valid ticket
 POST http://localhost:8080/api/tickets

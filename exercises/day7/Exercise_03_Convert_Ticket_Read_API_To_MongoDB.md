@@ -73,7 +73,7 @@ GET http://localhost:8080/api/tickets
 Then test one existing ticket ID:
 
 ```http
-GET http://localhost:8080/api/tickets/{id}
+GET http://localhost:8080/api/tickets/6a50650ad0e1026b90eb03bd
 ```
 
 Then test a missing ticket ID:

@@ -1,82 +1,74 @@
 package com.example.supportdesk.service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.example.supportdesk.dto.CreateTicketRequest;
 import com.example.supportdesk.dto.TicketResponse;
 import com.example.supportdesk.exception.ResourceNotFoundException;
+import com.example.supportdesk.model.Ticket;
+import com.example.supportdesk.repository.TicketRepository;
 
 @Service
 public class TicketService {
-    private final List<TicketResponse> tickets = new ArrayList<>();
 
-    public TicketService() {
-        tickets.add(new TicketResponse(
-            "T001",
-            "Sample Ticket 1",
-            "This is a sample ticket description.",
-            "Software",
-            "High",
-            "Open",
-            "John Doe",
-            "2024-06-01"
-        ));
+    private final TicketRepository ticketRepository;
 
-        tickets.add(new TicketResponse(
-            "T002",
-            "Sample Ticket 2",
-            "This is another sample ticket description.",
-            "Hardware",
-            "Medium",
-            "In Progress",
-            "Jane Smith",
-            "2024-06-02"
-        ));
-
-        tickets.add(new TicketResponse(
-            "T003",
-            "Sample Ticket 3",
-            "This is yet another sample ticket description.",
-            "Network",
-            "Low",
-            "Closed",
-            "Alice Johnson",
-            "2024-06-03"
-        ));
+    // Inject the MongoDB repository via the constructor
+    public TicketService(TicketRepository ticketRepository) {
+        this.ticketRepository = ticketRepository;
     }
 
     public List<TicketResponse> getAllTickets() {
-        return tickets;
+        // 1. Retrieve all ticket documents from MongoDB
+        List<Ticket> tickets = ticketRepository.findAll();
+        
+        // 2. Convert them into TicketResponse DTOs using a stream
+        return tickets.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     public TicketResponse getTicketById(String id) {
-        return tickets.stream()
-                .filter(ticket -> ticket.getId().equalsIgnoreCase(id))
-                .findFirst()
+        // Search MongoDB by ID, throw exception if not found
+        Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket " + id + " was not found"));
+                
+        // Return the DTO
+        return mapToResponse(ticket);
     }
 
     public TicketResponse createTicket(CreateTicketRequest request) {
-        TicketResponse newTicket = new TicketResponse(
-            generateTicketId(),
-            request.getTitle(),
-            request.getDescription(),
-            request.getCategory(),
-            request.getPriority(),
-            "OPEN", // Default status for new tickets
-            request.getCreatedBy(),
-            java.time.LocalDate.now().toString()
+        // Create a new Ticket entity from the incoming request data
+        Ticket newTicket = new Ticket();
+        newTicket.setTitle(request.getTitle());
+        newTicket.setDescription(request.getDescription());
+        newTicket.setCategory(request.getCategory());
+        newTicket.setPriority(request.getPriority());
+        newTicket.setStatus("Open"); // Default status for new tickets
+        newTicket.setCreatedBy(request.getCreatedBy());
+
+        // Save it to MongoDB! MongoDB will automatically generate the 'id'
+        Ticket savedTicket = ticketRepository.save(newTicket);
+
+        // Convert the saved entity back to a DTO for the response
+        return mapToResponse(savedTicket);
+    }
+
+    // Helper method to convert a Ticket (Model) into a TicketResponse (DTO)
+    private TicketResponse mapToResponse(Ticket ticket) {
+        return new TicketResponse(
+            ticket.getId(),
+            ticket.getTitle(),
+            ticket.getDescription(),
+            ticket.getCategory(),
+            ticket.getPriority(),
+            ticket.getStatus(),
+            ticket.getCreatedBy(),
+            // Convert the MongoDB Date object to a String for the DTO
+            ticket.getCreatedAt() != null ? ticket.getCreatedAt().toString() : null 
         );
-        tickets.add(newTicket);
-        return newTicket;
     }
-
-    private String generateTicketId() {
-        return "T" + String.format("%03d", tickets.size() + 1);
-    }
-
-    
 }

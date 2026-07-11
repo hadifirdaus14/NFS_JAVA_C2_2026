@@ -3,6 +3,10 @@ package com.example.supportdesk.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.supportdesk.dto.CreateTicketRequest;
@@ -40,6 +44,22 @@ public class TicketService {
         return tickets.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+    public Page<TicketResponse> getTicketsPaged(int page, int size, String sortBy, String direction) {
+        // 1. Determine the sort direction dynamically
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(sortDirection, sortBy);
+        
+        // 2. Create the Pageable object
+        Pageable pageable = PageRequest.of(page, size, sort);
+        
+        // 3. Fetch the specific page from MongoDB
+        Page<Ticket> ticketPage = ticketRepository.findAll(pageable);
+        
+        // 4. Convert Page<Ticket> to Page<TicketResponse>
+        // The Page object has a built-in .map() function specifically for DTO conversion!
+        return ticketPage.map(this::mapToResponse);
     }
 
     public TicketResponse getTicketById(String id) {

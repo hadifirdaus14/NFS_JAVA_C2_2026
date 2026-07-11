@@ -21,11 +21,22 @@ public class TicketService {
         this.ticketRepository = ticketRepository;
     }
 
-    public List<TicketResponse> getAllTickets() {
-        // 1. Retrieve all ticket documents from MongoDB
-        List<Ticket> tickets = ticketRepository.findAll();
+    public List<TicketResponse> getAllTickets(String status, String priority, String category) {
+        List<Ticket> tickets;
+
+        // Check which filter was provided and call the matching repository method
+        if (status != null && !status.trim().isEmpty()) {
+            tickets = ticketRepository.findByStatusIgnoreCase(status);
+        } else if (priority != null && !priority.trim().isEmpty()) {
+            tickets = ticketRepository.findByPriorityIgnoreCase(priority);
+        } else if (category != null && !category.trim().isEmpty()) {
+            tickets = ticketRepository.findByCategoryIgnoreCase(category);
+        } else {
+            // If no filters are provided, return everything
+            tickets = ticketRepository.findAll();
+        }
         
-        // 2. Convert them into TicketResponse DTOs using a stream
+        // Convert the resulting entities into TicketResponse DTOs
         return tickets.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

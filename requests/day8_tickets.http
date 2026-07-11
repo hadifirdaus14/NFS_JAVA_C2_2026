@@ -1,0 +1,11 @@
+### GET all tickets
+GET http://localhost:8080/api/tickets
+
+###query for status "OPEN"
+GET http://localhost:8080/api/tickets?status=OPEN
+
+###query for priority "HIGH"
+GET http://localhost:8080/api/tickets?priority=HIGH
+
+###query for category "Email"
+GET http://localhost:8080/api/tickets?category=Email

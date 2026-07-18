@@ -1,5 +1,12 @@
 package com.example.supportdesk.security;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.List;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,12 +32,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.List;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -54,6 +55,10 @@ public class SecurityConfig {
                         // Protected Ticket Endpoints
                         .requestMatchers(HttpMethod.GET, "/api/tickets", "/api/tickets/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/tickets").hasRole("ADMIN")
+
+                        // Protected Ticket V1 Endpoints
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tickets", "/api/v1/tickets/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/tickets").hasAnyRole("USER", "ADMIN")
                         
                         // Fallback
                         .anyRequest().authenticated()

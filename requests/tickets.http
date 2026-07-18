@@ -47,3 +47,15 @@ GET http://localhost:8080/api/tickets?priority=HIGH
 GET http://localhost:8080/api/tickets?category=Email
 
 ###all endpoints are working fine.
+
+@baseUrl = http://localhost:8080
+
+### 3. Register a normal user - should return token with role USER
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Normal User",
+  "email": "user@example.com",
+  "password": "User@12345"
+}

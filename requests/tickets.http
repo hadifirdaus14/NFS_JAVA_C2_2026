@@ -71,7 +71,7 @@ Content-Type: application/json
 
 ### Testing V1 Endpoints with and without token
 ### 1. Test V1 without token (Should reject with 401 Unauthorized)
-GET http://localhost:8080/api/v1/tickets
+GET {{baseUrl}}/api/v1/tickets
 Content-Type: application/json
 
 
@@ -84,19 +84,29 @@ Content-Type: application/json
   "password": "User@12345"
 }
 
-# {%
-#     // Assuming your REST client can save variables. If not, copy the token manually.
-#     client.global.set("auth_token", response.body.token);
-# %}
-
-@auth_token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwicm9sZSI6IlVTRVIiLCJpc3MiOiJhc3NldC10cmFja2VyLWFwaSIsIm5hbWUiOiJOb3JtYWwgVXNlciIsImV4cCI6MTc4NDM2Mjg4NiwiaWF0IjoxNzg0MzU5Mjg2LCJ1c2VySWQiOiI2YTViMjBiZGFiNTQ4ZTM5MzBmZDYzYjcifQ.zYq0WCOa0LaHVwFcVoAy_5l-_Cre47IYjw5Vv5rQX-U
+### Jwt Token copy paste here
+@auth_token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJBRE1JTiIsImlzcyI6ImFzc2V0LXRyYWNrZXItYXBpIiwibmFtZSI6IkFkbWluIFVzZXIiLCJleHAiOjE3ODQzNjkwMjcsImlhdCI6MTc4NDM2NTQyNywidXNlcklkIjoiNmE1YjFmYzY0ZGVkNjFjNDI1NDc2Y2YxIn0.jBbNDw2rpDI9P5HWAbdA3--bf9Xr6GiMOeSJ44O-GOU
 ### 3. Test V1 WITH valid USER token (Should succeed with 200 OK)
-GET http://localhost:8080/api/v1/tickets
+GET {{baseUrl}}/api/v1/tickets
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 
 ### 4. Test Old Route with valid token (Should still work for backwards compatibility!)
-GET http://localhost:8080/api/tickets
+GET {{baseUrl}}/api/tickets
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
+
+### Get Ticket Status Report
+GET {{baseUrl}}/api/v1/reports/tickets-by-status
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+### Get Ticket Priority Report
+GET http://localhost:8080/api/v1/reports/tickets-by-priority
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+### Get API Documentation
+GET http://localhost:8080/api/docs
+Content-Type: application/json

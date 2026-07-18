@@ -49,8 +49,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Public Endpoints
-                        .requestMatchers("/api/health").permitAll()
+                        .requestMatchers("/api/health", "/error").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/docs/**").permitAll()
                         
                         // Protected Ticket Endpoints
                         .requestMatchers(HttpMethod.GET, "/api/tickets", "/api/tickets/**").hasAnyRole("USER", "ADMIN")
@@ -59,6 +60,7 @@ public class SecurityConfig {
                         // Protected Ticket V1 Endpoints
                         .requestMatchers(HttpMethod.GET, "/api/v1/tickets", "/api/v1/tickets/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/tickets").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/reports/**").hasAnyRole("USER", "ADMIN")
                         
                         // Fallback
                         .anyRequest().authenticated()

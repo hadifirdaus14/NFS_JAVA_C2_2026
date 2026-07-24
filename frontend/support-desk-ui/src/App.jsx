@@ -5,6 +5,7 @@ import TicketList from "./components/TicketList";
 import TicketDetail from "./components/TicketDetail";
 import { sampleTickets } from "./data/sampleTickets";
 import TicketFilter from "./components/TicketFilter";
+import ApiInfo from "./components/ApiInfo";
 
 export default function App() {
   const [selectedId, setSelectedId] = useState(null);
@@ -34,6 +35,7 @@ export default function App() {
   return (
     <Layout>
       <div className="ticket-page">
+        <ApiInfo />
         <TicketFilter
           searchText={searchText}
           onSearchChange={setSearchText}

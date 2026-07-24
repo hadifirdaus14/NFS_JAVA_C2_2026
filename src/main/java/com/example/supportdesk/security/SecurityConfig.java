@@ -52,7 +52,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/health", "/error").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/docs/**").permitAll()
-                        
+                        .requestMatchers("/api/v1/info").permitAll()
+
                         // Protected Ticket Endpoints
                         .requestMatchers(HttpMethod.GET, "/api/tickets", "/api/tickets/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/tickets").hasRole("ADMIN")

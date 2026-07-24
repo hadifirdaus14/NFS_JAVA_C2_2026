@@ -40,3 +40,16 @@ Answer briefly:
 ## Submit
 
 Your component tree and short reflection answers in Google Classroom.
+
+App
+├── Layout
+│   └── AppHeader
+├── TicketFilter
+├── TicketFilterPanel
+├── ApiInfo
+├── TicketDetail
+│   ├── PriorityBadge
+│   └── StatusBadge
+└── TicketList
+    ├── PriorityBadge
+    └── StatusBadge

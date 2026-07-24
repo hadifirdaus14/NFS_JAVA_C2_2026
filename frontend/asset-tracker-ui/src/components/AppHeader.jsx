@@ -4,6 +4,9 @@ export default function AppHeader() {
             <div>
                 <p classname="eyebrow">Day 11 React Fundamentals</p>
                 <h1>Asset Tracker UI</h1>
+                <p>
+                    Components, props, state, effects, loading states and error handling
+                </p>
             </div>
         </header>
     );

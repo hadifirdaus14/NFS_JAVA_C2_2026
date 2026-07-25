@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router';
 
+import './App.css';
 import TicketsPage from './pages/TicketsPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';

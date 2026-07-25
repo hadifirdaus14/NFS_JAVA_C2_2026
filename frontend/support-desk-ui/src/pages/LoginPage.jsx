@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
 import ErrorMessage from "../components/ErrorMessage.jsx";
 import LoadingMessage from "../components/LoadingMessage.jsx";
@@ -7,6 +7,11 @@ import LoadingMessage from "../components/LoadingMessage.jsx";
 export default function LoginPage() {
     const { login } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Where did ProtectedRoute want to send us? Fall back to the dashboard
+    // if the user came to /login directly (no saved location).
+    const from = location.state?.from?.pathname || "/app/dashboard";
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -20,7 +25,7 @@ export default function LoginPage() {
 
         try {
             await login(email, password);
-            navigate("/app/dashboard");
+            navigate(from, { replace: true });
         } catch (err) {
             setError(err.message);
         } finally {
@@ -32,7 +37,7 @@ export default function LoginPage() {
         <main className="login-page">
       <section className="login-card">
         <p className="eyebrow">Day 12</p>
-        <h1>Login to Asset Tracker</h1>
+        <h1>Login to Support Desk</h1>
         <p>
           This login calls our Day 9 backend, stores the JWT in localStorage for this demo
           and redirects the user to the protected area of our application.

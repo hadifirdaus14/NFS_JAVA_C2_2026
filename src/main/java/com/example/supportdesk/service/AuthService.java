@@ -79,9 +79,9 @@ public class AuthService {
                 token,
                 "Bearer",
                 jwtService.getExpirationMinutes(), // Grabs the expiration time for the response body
-                user.getEmail(),
                 user.getId(),
                 user.getName(),
+                user.getEmail(),
                 user.getRole()
         );
     }

@@ -2,12 +2,12 @@ import LoadingMessage from "./LoadingMessage";
 import ErrorMessage from "./ErrorMessage";
 
 export default function ApiInfoCard({ loading, error, apiInfo, apiDocs }) {
-    return (
-        <section className="card api-card">
-            <div className="section-heading">
-                <h2>Backend Connection</h2>
-                <p>Fetched using useEffect from the public Day 10 backend endpoints.</p>
-            </div>
+  return (
+    <section className="card api-card">
+      <div className="section-heading">
+        <h2>Backend Connection</h2>
+        <p>Fetched using useEffect from the public Day 10 backend endpoints.</p>
+      </div>
 
             {loading && <LoadingMessage message="Loading API info..." />}
             {error && <ErrorMessage message={error} />}

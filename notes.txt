@@ -137,46 +137,6 @@ By the end of day 10, our backed should now have:
 
 
 
-
-===================================== Day 11: React Fundamentals =====================================
-
-React Concepts Guide
-
-Components
-A reusable piece of UI
-Example:
-function StatusBadge({ status }){
-    return <span>{status}</span>
-}
-
-JSX
-JSX lets us write UI inside of JavaScript
-Looks like HTML, but with js syntax
-
-Props
-Props are inputs passed from a parent component to a child Component
-<StatusBadge status="AVAILABLE" />
-
-Inside the child:
-function StatusBadge({ status }){
-    return <span>{status}</span>
-}
-
-State
-State is data that can change while your app is running
-const [selectedAsset, setSelectedAsset] = useState(null);
-
-useEffect
-used for side effects
-Examples:
-1. API calls
-2. reading local storage
-3. setting up timers
-4. Syncing with external systems
-For day 11, we will use it to load public API information from the backed
-
-Loading, error, empty and success states
-Loading: data is being loaded 
 ===================================== Day 11: React Basics =====================================
 
 Component
@@ -230,14 +190,6 @@ error: something failed
 empty: request succeeded but no data is available
 success: data is available
 
-Component Tree
-shows how components are arranged
-EXAMPLE: 
-App
-|---Layout
-|---SummaryCards
-|---FilterPanel
-|---AssetList
 
 Component tree
 shows how components are arranged.
@@ -270,17 +222,6 @@ Traditional Website
 2, Browser requests new HTML page from the Server
 3. Server send full HTML page
 4. Brower reloads the page
-
-REACT SPA
-User clicks link
-React Router updates the browser URL
-React changes the component shown
-The page does not fully reload
-
-BrowserRouter
-This activates routing for the app
-It uses the browser History API so the app can respond to URL changes
-main.jsx wraps the whole app
 App.jsx defines the routes
 
     <BrowserRouter>

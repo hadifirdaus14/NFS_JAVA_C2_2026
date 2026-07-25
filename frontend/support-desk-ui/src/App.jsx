@@ -1,61 +1,37 @@
-import { useState } from "react";
-import "./App.css";
-import Layout from "./components/Layout";
-import TicketList from "./components/TicketList";
-import TicketDetail from "./components/TicketDetail";
-import { sampleTickets } from "./data/sampleTickets";
-import TicketFilter from "./components/TicketFilter";
-import ApiInfo from "./components/ApiInfo";
+import { Navigate, Route, Routes } from 'react-router';
+
+import TicketsPage from './pages/TicketsPage.jsx';
+import DashboardPage from './pages/DashboardPage.jsx';
+import LoginPage from './pages/LoginPage.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
+import AppShell from './components/AppShell.jsx';
+import NotFoundPage from './pages/NotFoundPage.jsx';
+import DocsPage from './pages/DocsPage.jsx';
+import ReportsPage from './pages/ReportsPage.jsx';
+
 
 export default function App() {
-  const [selectedId, setSelectedId] = useState(null);
-  const [searchText, setSearchText] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
-  const [priorityFilter, setPriorityFilter] = useState("ALL");
-
-  const selectedTicket = sampleTickets.find(
-    (ticket) => ticket.id === selectedId
-  );
-
-  const filteredTickets = sampleTickets.filter((ticket) => {
-    const search = searchText.toLowerCase();
-    const matchesSearch =
-      ticket.title.toLowerCase().includes(search) ||
-      ticket.category.toLowerCase().includes(search);
-
-    const matchesStatus =
-      statusFilter === "ALL" || ticket.status === statusFilter;
-
-    const matchesPriority =
-      priorityFilter === "ALL" || ticket.priority === priorityFilter;
-
-    return matchesSearch && matchesStatus && matchesPriority;
-  });
-
   return (
-    <Layout>
-      <div className="ticket-page">
-        <ApiInfo />
-        <TicketFilter
-          searchText={searchText}
-          onSearchChange={setSearchText}
-          statusFilter={statusFilter}
-          onStatusChange={setStatusFilter}
-          priorityFilter={priorityFilter}
-          onPriorityChange={setPriorityFilter}
-        />
-        <p className="ticket-count">
-          Showing {filteredTickets.length} of {sampleTickets.length} tickets
-        </p>
-        <div className="ticket-board">
-          <TicketList
-            tickets={filteredTickets}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-          />
-          <TicketDetail ticket={selectedTicket} />
-        </div>
-      </div>
-    </Layout>
+    <Routes>
+      <Route path="/" element={<Navigate to="/app/dashboard" replace />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/docs" element={<DocsPage />} />
+
+      <Route
+        path="/app"
+        element={
+          <ProtectedRoute>
+            <AppShell />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="tickets" element={<TicketsPage />} />
+        <Route path="reports" element={<ReportsPage />} />
+      </Route>
+
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
   );
 }

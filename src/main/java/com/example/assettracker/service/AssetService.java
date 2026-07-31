@@ -1,6 +1,7 @@
 package com.example.assettracker.service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,13 +13,14 @@ import org.springframework.stereotype.Service;
 
 import com.example.assettracker.dto.AssetResponse;
 import com.example.assettracker.dto.CreateAssetRequest;
+import com.example.assettracker.dto.UpdateAssetRequest;
 import com.example.assettracker.exception.DuplicateResourceException;
+import com.example.assettracker.exception.InvalidRequestException;
 import com.example.assettracker.exception.ResourceNotFoundException;
 import com.example.assettracker.model.Asset;
 import com.example.assettracker.repository.AssetRepository;
 
 /*
- * AssetService
  * ------------
  * Services contain business logic. This Day 8 version uses AssetRepository
  * to query MongoDB documents, add filtering, add pagination/sorting, and log
@@ -28,6 +30,24 @@ import com.example.assettracker.repository.AssetRepository;
 public class AssetService {
 
     private static final Logger logger = LoggerFactory.getLogger(AssetService.class);
+
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of(
+            "assetTag", 
+            "name", 
+            "category", 
+            "serialNumber", 
+            "status", 
+            "location", 
+            "assignedTo"
+    );
+
+    private static final Set<String> ALLOWED_STATUSES = Set.of(
+            "AVAILABLE", 
+            "ASSIGNED", 
+            "MAINTENANCE", 
+            "RETIRED"
+    );
+
 
     private final AssetRepository assetRepository;
 
@@ -103,6 +123,59 @@ public class AssetService {
 
         Asset savedAsset = assetRepository.save(asset);
         return toResponse(savedAsset);
+    }
+
+    public AssetResponse updateAsset(String id, UpdateAssetRequest request) {
+        logger.info("Updating asset id={}", id);
+
+        Asset asset = assetRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Asset " + id + " was not found"));
+
+        String assetTag = request.getAssetTag().trim();
+        String serialNumber = request.getSerialNumber().trim();
+        String status = request.getStatus().trim().toUpperCase();
+
+        validateStatus(status);
+
+        if (!asset.getAssetTag().equalsIgnoreCase(assetTag) && assetRepository.existsByAssetTag(assetTag)) {
+            throw new DuplicateResourceException("Asset tag already exists: " + assetTag);
+        }
+
+        if (!asset.getSerialNumber().equalsIgnoreCase(serialNumber) && assetRepository.existsBySerialNumber(serialNumber)) {
+            throw new DuplicateResourceException("Serial number already exists: " + serialNumber);
+        }
+
+        asset.setAssetTag(assetTag);
+        asset.setName(request.getName().trim());
+        asset.setCategory(request.getCategory().trim());
+        asset.setSerialNumber(serialNumber);
+        asset.setStatus(status);
+        asset.setLocation(request.getLocation().trim());
+        asset.setAssignedTo(request.getAssignedTo());   // implement assignedTo logic in the future
+
+        Asset updatedAsset = assetRepository.save(asset);
+        return toResponse(updatedAsset);
+    }
+
+    private void validatePageRequest(int page, int size, String sortBy, String direction) {
+        if (page < 0) {
+            throw new InvalidRequestException("Page index must not be negative");
+        }
+        if (size < 1 || size > 50) {
+            throw new InvalidRequestException("Page size must be between 1 and 50");
+        }
+        if (!ALLOWED_SORT_FIELDS.contains(sortBy)) {
+            throw new InvalidRequestException("Invalid sort field: " + sortBy + ". Allowed fields are: " + ALLOWED_SORT_FIELDS);
+        }
+        if (!direction.equalsIgnoreCase("asc") && !direction.equalsIgnoreCase("desc")) {
+            throw new InvalidRequestException("Invalid sort direction: " + direction + ". Allowed values are: asc, desc");
+        }
+    }
+
+    private void validateStatus(String status) {
+        if (!ALLOWED_STATUSES.contains(status)) {
+            throw new InvalidRequestException("Invalid status: " + status + ". Allowed statuses are: " + ALLOWED_STATUSES);
+        }
     }
 
     private boolean hasValue(String value) {

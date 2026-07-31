@@ -1,16 +1,22 @@
 package com.example.supportdesk.service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.example.supportdesk.exception.InvalidRequestException;
 import com.example.supportdesk.dto.CreateTicketRequest;
 import com.example.supportdesk.dto.TicketResponse;
+import com.example.supportdesk.dto.UpdateTicketRequest;
+import com.example.supportdesk.exception.DuplicateResourceException;
 import com.example.supportdesk.exception.ResourceNotFoundException;
 import com.example.supportdesk.model.Ticket;
 import com.example.supportdesk.repository.TicketRepository;
@@ -18,7 +24,23 @@ import com.example.supportdesk.repository.TicketRepository;
 @Service
 public class TicketService {
 
+    private static final Logger logger = LoggerFactory.getLogger(TicketService.class);
+
     private final TicketRepository ticketRepository;
+
+    private static final Set<String> ALLOWED_STATUSES = Set.of(
+            "OPEN", 
+            "IN PROGRESS", 
+            "RESOLVED", 
+            "CLOSED"
+    );
+
+    private static final Set<String> ALLOWED_PRIORITIES = Set.of(
+            "LOW", 
+            "MEDIUM", 
+            "HIGH", 
+            "CRITICAL"
+    );
 
     // Inject the MongoDB repository via the constructor
     public TicketService(TicketRepository ticketRepository) {
@@ -87,6 +109,45 @@ public class TicketService {
 
         // Convert the saved entity back to a DTO for the response
         return mapToResponse(savedTicket);
+    }
+
+    public TicketResponse updateTicket(String id, UpdateTicketRequest request){
+        logger.info("Updating ticket with id={}", id);
+
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket " + id + " was not found"));
+
+        String title = request.getTitle().trim();
+        String priority = request.getPriority().trim();
+        String status = request.getStatus().trim();
+
+        validateStatus(status);
+        validatePriority(priority);
+
+        if(!ticket.getTitle().equalsIgnoreCase(title) && ticketRepository.existsByTitle(title)) {
+            throw new DuplicateResourceException("Ticket title already exists: " + title);
+        }
+
+        ticket.setTitle(title);
+        ticket.setCategory(request.getCategory().trim());
+        ticket.setDescription(request.getDescription().trim());
+        ticket.setPriority(priority);
+        ticket.setStatus(status);
+
+        Ticket updatedTicket = ticketRepository.save(ticket);
+        return mapToResponse(updatedTicket);
+    }
+
+    private void validateStatus(String status) {
+        if (!ALLOWED_STATUSES.contains(status)) {
+            throw new InvalidRequestException("Invalid status: " + status + ". Allowed statuses are: " + ALLOWED_STATUSES);
+        }
+    }
+
+    private void validatePriority(String priority) {
+        if (!ALLOWED_PRIORITIES.contains(priority)) {
+            throw new InvalidRequestException("Invalid priority: " + priority + ". Allowed priorities are: " + ALLOWED_PRIORITIES);
+        }
     }
 
     // Helper method to convert a Ticket (Model) into a TicketResponse (DTO)

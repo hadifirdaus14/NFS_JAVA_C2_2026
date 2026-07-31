@@ -14,4 +14,6 @@ public interface TicketRepository extends MongoRepository<Ticket, String> {
     List<Ticket> findByPriorityIgnoreCase(String priority);
 
     List<Ticket> findByCategoryIgnoreCase(String category);
+
+    boolean existsByTitle(String title);
 }

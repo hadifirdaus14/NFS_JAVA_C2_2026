@@ -53,3 +53,6 @@ App
 └── TicketList
     ├── PriorityBadge
     └── StatusBadge
+
+    
+Your component tree and short reflection answers.

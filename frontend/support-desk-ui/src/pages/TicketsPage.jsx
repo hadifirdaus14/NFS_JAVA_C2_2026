@@ -21,6 +21,7 @@ export default function TicketsPage() {
     error,
     pageInfo,
     cacheMessage,
+    updatingId,
     filters,
     loadTicketsPage,
     refreshTickets,
@@ -32,7 +33,8 @@ export default function TicketsPage() {
     setSearchText,
     setStatusFilter,
     setPriorityFilter,
-    selectTicket
+    selectTicket,
+    changeTicketStatus
   } = useTicketData();
 
   // Load the first page when the page mounts.
@@ -95,7 +97,11 @@ export default function TicketsPage() {
             selectedId={selectedTicket?.id ?? null}
             onSelect={selectTicket}
           />
-          <TicketDetail ticket={selectedTicket} />
+          <TicketDetail
+            ticket={selectedTicket}
+            onStatusChange={changeTicketStatus}
+            updating={updatingId === selectedTicket?.id}
+          />
         </section>
       )}
     </>

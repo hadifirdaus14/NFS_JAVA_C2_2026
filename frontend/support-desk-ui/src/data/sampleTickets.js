@@ -49,7 +49,7 @@ export const sampleTickets = [
     title: 'Printer on 3rd floor jamming',
     category: 'Hardware',
     priority: 'LOW',
-    status: 'RESOLVED',
+    status: 'CLOSED',
     createdBy: 'noah@example.com',
     createdAt: '2026-07-14'
   },
@@ -67,7 +67,7 @@ export const sampleTickets = [
     title: 'Slow internet in meeting room B',
     category: 'Network',
     priority: 'MEDIUM',
-    status: 'RESOLVED',
+    status: 'CLOSED',
     createdBy: 'diego@example.com',
     createdAt: '2026-07-16'
   },

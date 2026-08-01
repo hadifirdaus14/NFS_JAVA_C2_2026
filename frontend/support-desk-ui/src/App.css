@@ -714,6 +714,23 @@ textarea:focus {
   gap: 8px;
   margin-bottom: 20px;
 }
+
+.status-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.status-actions-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.status-actions button {
+  padding: 6px 12px;
+  font-size: 13px;
+}
 .ticket-detail-meta {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

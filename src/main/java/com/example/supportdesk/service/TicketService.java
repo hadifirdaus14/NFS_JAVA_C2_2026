@@ -29,17 +29,15 @@ public class TicketService {
     private final TicketRepository ticketRepository;
 
     private static final Set<String> ALLOWED_STATUSES = Set.of(
-            "OPEN", 
-            "IN PROGRESS", 
-            "RESOLVED", 
+            "OPEN",
+            "IN_PROGRESS",
             "CLOSED"
     );
 
     private static final Set<String> ALLOWED_PRIORITIES = Set.of(
-            "LOW", 
-            "MEDIUM", 
-            "HIGH", 
-            "CRITICAL"
+            "LOW",
+            "MEDIUM",
+            "HIGH"
     );
 
     // Inject the MongoDB repository via the constructor

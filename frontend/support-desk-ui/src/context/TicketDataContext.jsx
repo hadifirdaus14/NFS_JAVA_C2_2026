@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
-import { fetchPagedTickets } from '../services/api.js';
+import { fetchPagedTickets, updateTicket } from '../services/api.js';
 import { useAuth } from './AuthContext.jsx';
 
 const TicketDataContext = createContext(null);
@@ -9,6 +9,7 @@ const initialState = {
   selectedTicketId: '',
   loading: false,
   error: '',
+  updatingId: '',   // id of the ticket currently being saved (for a pending indicator)
   // Server-side paging + sorting state
   pageInfo: {
     page: 0,
@@ -32,6 +33,37 @@ const initialState = {
 // One page response is uniquely identified by these four values.
 function makeCacheKey(params) {
   return `${params.page}|${params.size}|${params.sortBy}|${params.direction}`;
+}
+
+// Return a NEW list with one ticket swapped out (never mutate the original).
+function replaceTicket(tickets, updatedTicket) {
+  return tickets.map((ticket) => (ticket.id === updatedTicket.id ? updatedTicket : ticket));
+}
+
+// Keep every cached page consistent by swapping the ticket inside each page's content.
+function replaceTicketInCache(cache, updatedTicket) {
+  const nextCache = {};
+
+  Object.entries(cache).forEach(([key, pageData]) => {
+    nextCache[key] = {
+      ...pageData,
+      content: replaceTicket(pageData.content ?? [], updatedTicket)
+    };
+  });
+
+  return nextCache;
+}
+
+// The PUT endpoint needs the whole ticket, not just the changed status.
+function toUpdatePayload(ticket) {
+  return {
+    title: ticket.title,
+    description: ticket.description,
+    category: ticket.category,
+    priority: ticket.priority,
+    status: ticket.status,
+    assignedTo: ticket.assignedTo ?? ''
+  };
 }
 
 function ticketReducer(state, action) {
@@ -84,6 +116,34 @@ function ticketReducer(state, action) {
 
     case 'SELECT_TICKET':
       return { ...state, selectedTicketId: action.ticketId };
+
+    case 'OPTIMISTIC_UPDATE':
+      // Show the change immediately, before the backend has confirmed it.
+      return {
+        ...state,
+        updatingId: action.ticket.id,
+        tickets: replaceTicket(state.tickets, action.ticket),
+        cache: replaceTicketInCache(state.cache, action.ticket)
+      };
+
+    case 'UPDATE_SUCCESS':
+      // Backend confirmed — replace with its authoritative version.
+      return {
+        ...state,
+        updatingId: '',
+        tickets: replaceTicket(state.tickets, action.ticket),
+        cache: replaceTicketInCache(state.cache, action.ticket)
+      };
+
+    case 'ROLLBACK_UPDATE':
+      // Backend rejected — restore the backup ticket and show the error.
+      return {
+        ...state,
+        updatingId: '',
+        tickets: replaceTicket(state.tickets, action.ticket),
+        cache: replaceTicketInCache(state.cache, action.ticket),
+        error: action.message
+      };
 
     default:
       return state;
@@ -157,6 +217,34 @@ export function TicketDataProvider({ children }) {
   const setSortDirection = useCallback((direction) => loadTicketsPage({ direction, page: 0 }), [loadTicketsPage]);
 
   // Client-side filters: just update state, no re-fetch
+  // Optimistic status change: update the UI now, reconcile with the backend after.
+  const changeTicketStatus = useCallback(async (ticketId, nextStatus) => {
+    const currentTicket = state.tickets.find((ticket) => ticket.id === ticketId);
+
+    // Nothing to do if the ticket is gone or already has that status.
+    if (!currentTicket || currentTicket.status === nextStatus) {
+      return;
+    }
+
+    // 1. currentTicket is our backup. 2. Show the new status immediately.
+    const optimisticTicket = { ...currentTicket, status: nextStatus };
+    dispatch({ type: 'OPTIMISTIC_UPDATE', ticket: optimisticTicket });
+
+    try {
+      // 3. Send PUT to the backend.
+      const savedTicket = await updateTicket(ticketId, token, toUpdatePayload(optimisticTicket));
+      // 4. Success — keep the backend's authoritative response.
+      dispatch({ type: 'UPDATE_SUCCESS', ticket: savedTicket });
+    } catch (error) {
+      // 5. Failure — roll back to the backup ticket.
+      dispatch({
+        type: 'ROLLBACK_UPDATE',
+        ticket: currentTicket,
+        message: error.message || 'Could not update status. Reverted the change.'
+      });
+    }
+  }, [state.tickets, token]);
+
   const setSearchText = useCallback((value) => dispatch({ type: 'SET_SEARCH_TEXT', value }), []);
   const setStatusFilter = useCallback((value) => dispatch({ type: 'SET_STATUS_FILTER', value }), []);
   const setPriorityFilter = useCallback((value) => dispatch({ type: 'SET_PRIORITY_FILTER', value }), []);
@@ -203,9 +291,10 @@ export function TicketDataProvider({ children }) {
       setSearchText,
       setStatusFilter,
       setPriorityFilter,
-      selectTicket
+      selectTicket,
+      changeTicketStatus
     }),
-    [state, visibleTickets, selectedTicket, loadTicketsPage, refreshTickets, goToNextPage, goToPreviousPage, setPageSize, setSortBy, setSortDirection, setSearchText, setStatusFilter, setPriorityFilter, selectTicket]
+    [state, visibleTickets, selectedTicket, loadTicketsPage, refreshTickets, goToNextPage, goToPreviousPage, setPageSize, setSortBy, setSortDirection, setSearchText, setStatusFilter, setPriorityFilter, selectTicket, changeTicketStatus]
   );
 
   return <TicketDataContext.Provider value={value}>{children}</TicketDataContext.Provider>;

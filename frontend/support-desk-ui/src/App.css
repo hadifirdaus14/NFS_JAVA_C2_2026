@@ -86,9 +86,10 @@ button.secondary,
   border-color: var(--accent-border);
 }
 
-/* Form fields: every input/select shares one look */
+/* Form fields: every input/select/textarea shares one look */
 input,
-select {
+select,
+textarea {
   font: inherit;
   font-size: 15px;
   width: 100%;
@@ -100,11 +101,22 @@ select {
   color: var(--text-h);
 }
 
+textarea {
+  resize: vertical;
+}
+
 input:focus,
-select:focus {
+select:focus,
+textarea:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.success-message {
+  background: var(--success-bg);
+  color: var(--success);
+  border-color: var(--success-border);
 }
 
 /* Messages: shared base, then colour by state */
@@ -360,6 +372,115 @@ select:focus {
 }
 .login-help strong {
   color: var(--text-h);
+}
+
+/* ============================================================
+   Ticket form wizard
+   ============================================================ */
+
+.ticket-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Step indicator */
+.step-indicator {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.step-indicator li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.step-indicator .step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: var(--social-bg);
+  color: var(--text);
+}
+.step-indicator li.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.step-indicator li.active .step-number {
+  background: var(--accent);
+  color: #fff;
+}
+.step-indicator li.done .step-number {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+/* Field layout: two columns, some fields span the full width */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.form-grid-full {
+  grid-column: 1 / -1;
+}
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.form-grid label,
+.login-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+/* Inline validation error under a field */
+.field-error {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--danger);
+}
+
+/* Review step */
+.review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.review-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+.review-check input {
+  width: auto;
+}
+
+/* Buttons row at the bottom of the form */
+.form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
 }
 
 /* ============================================================

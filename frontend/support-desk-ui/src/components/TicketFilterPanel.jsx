@@ -17,7 +17,6 @@ export default function TicketFilterPanel({ searchText, statusFilter, priorityFi
           <option value="ALL">All</option>
           <option value="OPEN">Open</option>
           <option value="IN_PROGRESS">In Progress</option>
-          <option value="RESOLVED">Resolved</option>
           <option value="CLOSED">Closed</option>
         </select>
       </label>
@@ -29,7 +28,6 @@ export default function TicketFilterPanel({ searchText, statusFilter, priorityFi
           <option value="LOW">Low</option>
           <option value="MEDIUM">Medium</option>
           <option value="HIGH">High</option>
-          <option value="URGENT">Urgent</option>
         </select>
       </label>
 

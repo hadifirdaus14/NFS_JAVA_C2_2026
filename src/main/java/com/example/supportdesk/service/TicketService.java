@@ -100,7 +100,7 @@ public class TicketService {
         newTicket.setDescription(request.getDescription());
         newTicket.setCategory(request.getCategory());
         newTicket.setPriority(request.getPriority());
-        newTicket.setStatus("Open"); // Default status for new tickets
+        newTicket.setStatus("OPEN"); // Default status for new tickets (uppercase, matches filters/seeder)
         newTicket.setCreatedBy(request.getCreatedBy());
         newTicket.setCreatedAt(new java.util.Date().toString()); // Set the current date/time as a string
 

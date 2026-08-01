@@ -375,6 +375,42 @@ textarea:focus {
 }
 
 /* ============================================================
+   Ticket filter panel (search + status + priority in one row)
+   ============================================================ */
+
+.ticket-filter-panel {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--social-bg);
+}
+
+.ticket-filter-panel label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+/* Make the search field wider than the two dropdowns */
+.ticket-filter-panel label:first-child {
+  flex: 2 1 0;
+}
+
+@media (max-width: 640px) {
+  .ticket-filter-panel label {
+    flex-basis: 100%;
+  }
+}
+
+/* ============================================================
    Pagination + sort bar
    ============================================================ */
 

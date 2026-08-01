@@ -415,6 +415,20 @@ textarea:focus {
   white-space: nowrap;
 }
 
+.cache-tag {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  white-space: nowrap;
+}
+.cache-tag.cache-hit {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
 /* ============================================================
    Reports page
    ============================================================ */

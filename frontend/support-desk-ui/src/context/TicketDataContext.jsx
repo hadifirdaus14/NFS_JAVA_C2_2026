@@ -18,6 +18,9 @@ const initialState = {
     totalPages: 0,
     totalElements: 0
   },
+  // In-memory cache of previously fetched pages, keyed by page|size|sortBy|direction
+  cache: {},
+  cacheMessage: 'No page loaded yet.',
   // Client-side filters applied to the current page
   filters: {
     searchText: '',
@@ -26,10 +29,15 @@ const initialState = {
   }
 };
 
+// One page response is uniquely identified by these four values.
+function makeCacheKey(params) {
+  return `${params.page}|${params.size}|${params.sortBy}|${params.direction}`;
+}
+
 function ticketReducer(state, action) {
   switch (action.type) {
     case 'LOAD_START':
-      return { ...state, loading: true, error: '' };
+      return { ...state, loading: true, error: '', cacheMessage: 'Fetching from backend…' };
 
     case 'LOAD_SUCCESS': {
       // action.data is the Spring Page object; action.params is what we requested
@@ -37,6 +45,11 @@ function ticketReducer(state, action) {
 
       const selectedStillVisible = tickets.some((ticket) => ticket.id === state.selectedTicketId);
       const selectedTicketId = selectedStillVisible ? state.selectedTicketId : tickets[0]?.id ?? '';
+
+      // On a cache HIT we keep the cache as-is; on a MISS we store the fresh page.
+      const nextCache = action.fromCache
+        ? state.cache
+        : { ...state.cache, [action.cacheKey]: action.data };
 
       return {
         ...state,
@@ -51,12 +64,14 @@ function ticketReducer(state, action) {
           direction: action.params.direction,
           totalPages: action.data.totalPages ?? 0,
           totalElements: action.data.totalElements ?? 0
-        }
+        },
+        cache: nextCache,
+        cacheMessage: action.fromCache ? 'Loaded from cache' : 'Fetched from backend'
       };
     }
 
     case 'LOAD_ERROR':
-      return { ...state, loading: false, error: action.message };
+      return { ...state, loading: false, error: action.message, cacheMessage: 'Could not load data.' };
 
     case 'SET_SEARCH_TEXT':
       return { ...state, filters: { ...state.filters, searchText: action.value } };
@@ -79,12 +94,16 @@ export function TicketDataProvider({ children }) {
   const { token } = useAuth();
   const [state, dispatch] = useReducer(ticketReducer, initialState);
 
-  // Keep the latest pageInfo in a ref so loadTicketsPage can read it WITHOUT
-  // depending on it — that keeps the function stable and avoids a fetch loop.
+  // Refs let loadTicketsPage read the latest pageInfo and cache WITHOUT depending
+  // on them — keeping the function stable so the mount effect doesn't loop.
   const pageInfoRef = useRef(state.pageInfo);
+  const cacheRef = useRef(state.cache);
   useEffect(() => {
     pageInfoRef.current = state.pageInfo;
   }, [state.pageInfo]);
+  useEffect(() => {
+    cacheRef.current = state.cache;
+  }, [state.cache]);
 
   const loadTicketsPage = useCallback(async (overrides = {}) => {
     const current = pageInfoRef.current;
@@ -95,17 +114,30 @@ export function TicketDataProvider({ children }) {
       direction: overrides.direction ?? current.direction
     };
 
+    const cacheKey = makeCacheKey(params);
+    const cachedPage = cacheRef.current[cacheKey];
+
+    // CACHE HIT: reuse the stored page unless the caller forced a refresh.
+    if (cachedPage && !overrides.force) {
+      dispatch({ type: 'LOAD_SUCCESS', data: cachedPage, params, cacheKey, fromCache: true });
+      return;
+    }
+
+    // CACHE MISS (or forced refresh): go to the backend.
     dispatch({ type: 'LOAD_START' });
 
     try {
       const data = await fetchPagedTickets(token, params);
-      dispatch({ type: 'LOAD_SUCCESS', data, params });
+      dispatch({ type: 'LOAD_SUCCESS', data, params, cacheKey, fromCache: false });
     } catch (error) {
       dispatch({ type: 'LOAD_ERROR', message: error.message || 'Could not load tickets.' });
     }
   }, [token]);
 
-  // Paging + sort controls: each one re-fetches from the backend
+  // Refresh = reload the CURRENT page but skip the cache.
+  const refreshTickets = useCallback(() => loadTicketsPage({ force: true }), [loadTicketsPage]);
+
+  // Paging + sort controls
   const goToNextPage = useCallback(() => {
     const { page, totalPages } = pageInfoRef.current;
     if (page + 1 < totalPages) {
@@ -120,7 +152,6 @@ export function TicketDataProvider({ children }) {
     }
   }, [loadTicketsPage]);
 
-  // Changing size/sort resets back to the first page
   const setPageSize = useCallback((size) => loadTicketsPage({ size: Number(size), page: 0 }), [loadTicketsPage]);
   const setSortBy = useCallback((sortBy) => loadTicketsPage({ sortBy, page: 0 }), [loadTicketsPage]);
   const setSortDirection = useCallback((direction) => loadTicketsPage({ direction, page: 0 }), [loadTicketsPage]);
@@ -131,7 +162,6 @@ export function TicketDataProvider({ children }) {
   const setPriorityFilter = useCallback((value) => dispatch({ type: 'SET_PRIORITY_FILTER', value }), []);
   const selectTicket = useCallback((ticketId) => dispatch({ type: 'SELECT_TICKET', ticketId }), []);
 
-  // Filter the CURRENT PAGE of tickets client-side
   const visibleTickets = useMemo(() => {
     const search = state.filters.searchText.trim().toLowerCase();
 
@@ -164,6 +194,7 @@ export function TicketDataProvider({ children }) {
       visibleTickets,
       selectedTicket,
       loadTicketsPage,
+      refreshTickets,
       goToNextPage,
       goToPreviousPage,
       setPageSize,
@@ -174,7 +205,7 @@ export function TicketDataProvider({ children }) {
       setPriorityFilter,
       selectTicket
     }),
-    [state, visibleTickets, selectedTicket, loadTicketsPage, goToNextPage, goToPreviousPage, setPageSize, setSortBy, setSortDirection, setSearchText, setStatusFilter, setPriorityFilter, selectTicket]
+    [state, visibleTickets, selectedTicket, loadTicketsPage, refreshTickets, goToNextPage, goToPreviousPage, setPageSize, setSortBy, setSortDirection, setSearchText, setStatusFilter, setPriorityFilter, selectTicket]
   );
 
   return <TicketDataContext.Provider value={value}>{children}</TicketDataContext.Provider>;

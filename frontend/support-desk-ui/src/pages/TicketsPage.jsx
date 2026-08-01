@@ -20,8 +20,10 @@ export default function TicketsPage() {
     loading,
     error,
     pageInfo,
+    cacheMessage,
     filters,
     loadTicketsPage,
+    refreshTickets,
     goToNextPage,
     goToPreviousPage,
     setPageSize,
@@ -66,6 +68,8 @@ export default function TicketsPage() {
 
       <TicketPagination
         pageInfo={pageInfo}
+        cacheMessage={cacheMessage}
+        onRefresh={refreshTickets}
         onNext={goToNextPage}
         onPrevious={goToPreviousPage}
         onPageSizeChange={setPageSize}

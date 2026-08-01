@@ -3,6 +3,8 @@ const PAGE_SIZES = [5, 10, 20];
 
 export default function TicketPagination({
   pageInfo,
+  cacheMessage,
+  onRefresh,
   onNext,
   onPrevious,
   onPageSizeChange,
@@ -13,6 +15,8 @@ export default function TicketPagination({
 
   const isFirstPage = page <= 0;
   const isLastPage = page + 1 >= totalPages;
+
+  const isFromCache = cacheMessage === 'Loaded from cache';
 
   return (
     <section className="pagination-bar" aria-label="Pagination and sorting">
@@ -45,6 +49,10 @@ export default function TicketPagination({
       </div>
 
       <div className="pagination-nav">
+        <span className={isFromCache ? 'cache-tag cache-hit' : 'cache-tag'}>{cacheMessage}</span>
+        <button type="button" className="button-link secondary" onClick={onRefresh}>
+          Refresh
+        </button>
         <button type="button" className="button-link secondary" onClick={onPrevious} disabled={isFirstPage}>
           Previous
         </button>

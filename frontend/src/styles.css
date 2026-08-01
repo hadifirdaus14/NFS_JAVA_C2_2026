@@ -580,3 +580,9 @@ code {
     grid-template-columns: 1fr;
   }
 }
+
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

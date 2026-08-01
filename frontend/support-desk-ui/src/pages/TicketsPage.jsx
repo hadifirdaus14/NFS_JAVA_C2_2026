@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import TicketList from '../components/TicketList.jsx';
 import TicketDetail from '../components/TicketDetail.jsx';
 import TicketFilterPanel from '../components/TicketFilterPanel.jsx';
+import TicketPagination from '../components/TicketPagination.jsx';
 import TicketSummaryCards from '../components/TicketSummaryCards.jsx';
 import ErrorMessage from '../components/ErrorMessage.jsx';
 import LoadingMessage from '../components/LoadingMessage.jsx';
@@ -12,29 +13,30 @@ import { useTicketData } from '../context/TicketDataContext.jsx';
 export default function TicketsPage() {
   const { user } = useAuth();
 
-  // Everything the page needs now comes from the shared context.
   const {
     tickets,
     visibleTickets,
     selectedTicket,
     loading,
     error,
+    pageInfo,
     filters,
-    loadTickets,
+    loadTicketsPage,
+    goToNextPage,
+    goToPreviousPage,
+    setPageSize,
+    setSortBy,
+    setSortDirection,
     setSearchText,
     setStatusFilter,
     setPriorityFilter,
     selectTicket
   } = useTicketData();
 
-  // Ask the context to load tickets when the page mounts.
+  // Load the first page when the page mounts.
   useEffect(() => {
-    loadTickets();
-  }, [loadTickets]);
-
-  if (loading) {
-    return <LoadingMessage message="Loading tickets..." />;
-  }
+    loadTicketsPage();
+  }, [loadTicketsPage]);
 
   if (error) {
     return <ErrorMessage message={error} />;
@@ -46,7 +48,7 @@ export default function TicketsPage() {
         <div>
           <p className="eyebrow">Ticket data</p>
           <h2>Tickets</h2>
-          <p>Loaded from the backend through a shared context, then filtered client-side.</p>
+          <p>Paged and sorted by the backend, then filtered client-side.</p>
         </div>
         {user?.role === 'ADMIN' && (
           <div className="action-row">
@@ -62,6 +64,15 @@ export default function TicketsPage() {
 
       <TicketSummaryCards tickets={tickets} />
 
+      <TicketPagination
+        pageInfo={pageInfo}
+        onNext={goToNextPage}
+        onPrevious={goToPreviousPage}
+        onPageSizeChange={setPageSize}
+        onSortByChange={setSortBy}
+        onSortDirectionChange={setSortDirection}
+      />
+
       <TicketFilterPanel
         searchText={filters.searchText}
         statusFilter={filters.statusFilter}
@@ -71,14 +82,18 @@ export default function TicketsPage() {
         onPriorityChange={setPriorityFilter}
       />
 
-      <section className="ticket-board">
-        <TicketList
-          tickets={visibleTickets}
-          selectedId={selectedTicket?.id ?? null}
-          onSelect={selectTicket}
-        />
-        <TicketDetail ticket={selectedTicket} />
-      </section>
+      {loading ? (
+        <LoadingMessage message="Loading tickets..." />
+      ) : (
+        <section className="ticket-board">
+          <TicketList
+            tickets={visibleTickets}
+            selectedId={selectedTicket?.id ?? null}
+            onSelect={selectTicket}
+          />
+          <TicketDetail ticket={selectedTicket} />
+        </section>
+      )}
     </>
   );
 }

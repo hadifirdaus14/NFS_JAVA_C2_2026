@@ -375,6 +375,47 @@ textarea:focus {
 }
 
 /* ============================================================
+   Pagination + sort bar
+   ============================================================ */
+
+.pagination-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--social-bg);
+}
+
+.pagination-sort {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.pagination-sort label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.pagination-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.pagination-status {
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* ============================================================
    Reports page
    ============================================================ */
 

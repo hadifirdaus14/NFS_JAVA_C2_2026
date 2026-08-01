@@ -1,18 +1,24 @@
-import { createContext, useCallback, useContext, useMemo, useReducer } from 'react';
-import { fetchTickets } from '../services/api.js';
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
+import { fetchPagedTickets } from '../services/api.js';
 import { useAuth } from './AuthContext.jsx';
 
 const TicketDataContext = createContext(null);
 
-// The whole "ticket list" world lives in one state object.
 const initialState = {
   tickets: [],
   selectedTicketId: '',
   loading: false,
   error: '',
+  // Server-side paging + sorting state
   pageInfo: {
-    total: 0
+    page: 0,
+    size: 5,
+    sortBy: 'createdAt',
+    direction: 'desc',
+    totalPages: 0,
+    totalElements: 0
   },
+  // Client-side filters applied to the current page
   filters: {
     searchText: '',
     statusFilter: 'ALL',
@@ -26,7 +32,8 @@ function ticketReducer(state, action) {
       return { ...state, loading: true, error: '' };
 
     case 'LOAD_SUCCESS': {
-      const tickets = action.tickets ?? [];
+      // action.data is the Spring Page object; action.params is what we requested
+      const tickets = action.data.content ?? [];
 
       const selectedStillVisible = tickets.some((ticket) => ticket.id === state.selectedTicketId);
       const selectedTicketId = selectedStillVisible ? state.selectedTicketId : tickets[0]?.id ?? '';
@@ -37,7 +44,14 @@ function ticketReducer(state, action) {
         selectedTicketId,
         loading: false,
         error: '',
-        pageInfo: { total: tickets.length }
+        pageInfo: {
+          page: action.data.number ?? action.params.page,
+          size: action.data.size ?? action.params.size,
+          sortBy: action.params.sortBy,
+          direction: action.params.direction,
+          totalPages: action.data.totalPages ?? 0,
+          totalElements: action.data.totalElements ?? 0
+        }
       };
     }
 
@@ -65,22 +79,59 @@ export function TicketDataProvider({ children }) {
   const { token } = useAuth();
   const [state, dispatch] = useReducer(ticketReducer, initialState);
 
-  const loadTickets = useCallback(async () => {
+  // Keep the latest pageInfo in a ref so loadTicketsPage can read it WITHOUT
+  // depending on it — that keeps the function stable and avoids a fetch loop.
+  const pageInfoRef = useRef(state.pageInfo);
+  useEffect(() => {
+    pageInfoRef.current = state.pageInfo;
+  }, [state.pageInfo]);
+
+  const loadTicketsPage = useCallback(async (overrides = {}) => {
+    const current = pageInfoRef.current;
+    const params = {
+      page: overrides.page ?? current.page,
+      size: overrides.size ?? current.size,
+      sortBy: overrides.sortBy ?? current.sortBy,
+      direction: overrides.direction ?? current.direction
+    };
+
     dispatch({ type: 'LOAD_START' });
 
     try {
-      const tickets = await fetchTickets(token);
-      dispatch({ type: 'LOAD_SUCCESS', tickets });
+      const data = await fetchPagedTickets(token, params);
+      dispatch({ type: 'LOAD_SUCCESS', data, params });
     } catch (error) {
       dispatch({ type: 'LOAD_ERROR', message: error.message || 'Could not load tickets.' });
     }
   }, [token]);
 
+  // Paging + sort controls: each one re-fetches from the backend
+  const goToNextPage = useCallback(() => {
+    const { page, totalPages } = pageInfoRef.current;
+    if (page + 1 < totalPages) {
+      loadTicketsPage({ page: page + 1 });
+    }
+  }, [loadTicketsPage]);
+
+  const goToPreviousPage = useCallback(() => {
+    const { page } = pageInfoRef.current;
+    if (page > 0) {
+      loadTicketsPage({ page: page - 1 });
+    }
+  }, [loadTicketsPage]);
+
+  // Changing size/sort resets back to the first page
+  const setPageSize = useCallback((size) => loadTicketsPage({ size: Number(size), page: 0 }), [loadTicketsPage]);
+  const setSortBy = useCallback((sortBy) => loadTicketsPage({ sortBy, page: 0 }), [loadTicketsPage]);
+  const setSortDirection = useCallback((direction) => loadTicketsPage({ direction, page: 0 }), [loadTicketsPage]);
+
+  // Client-side filters: just update state, no re-fetch
   const setSearchText = useCallback((value) => dispatch({ type: 'SET_SEARCH_TEXT', value }), []);
   const setStatusFilter = useCallback((value) => dispatch({ type: 'SET_STATUS_FILTER', value }), []);
   const setPriorityFilter = useCallback((value) => dispatch({ type: 'SET_PRIORITY_FILTER', value }), []);
   const selectTicket = useCallback((ticketId) => dispatch({ type: 'SELECT_TICKET', ticketId }), []);
 
+  // Filter the CURRENT PAGE of tickets client-side
   const visibleTickets = useMemo(() => {
     const search = state.filters.searchText.trim().toLowerCase();
 
@@ -112,18 +163,24 @@ export function TicketDataProvider({ children }) {
       ...state,
       visibleTickets,
       selectedTicket,
-      loadTickets,
+      loadTicketsPage,
+      goToNextPage,
+      goToPreviousPage,
+      setPageSize,
+      setSortBy,
+      setSortDirection,
       setSearchText,
       setStatusFilter,
       setPriorityFilter,
       selectTicket
     }),
-    [state, visibleTickets, selectedTicket, loadTickets, setSearchText, setStatusFilter, setPriorityFilter, selectTicket]
+    [state, visibleTickets, selectedTicket, loadTicketsPage, goToNextPage, goToPreviousPage, setPageSize, setSortBy, setSortDirection, setSearchText, setStatusFilter, setPriorityFilter, selectTicket]
   );
 
   return <TicketDataContext.Provider value={value}>{children}</TicketDataContext.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useTicketData() {
   const value = useContext(TicketDataContext);
 

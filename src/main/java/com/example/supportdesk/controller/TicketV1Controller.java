@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.data.domain.Page;
+
 import com.example.supportdesk.dto.CreateTicketRequest;
 import com.example.supportdesk.dto.TicketResponse;
 import com.example.supportdesk.dto.UpdateTicketRequest;
@@ -37,6 +39,15 @@ public class TicketV1Controller {
             @RequestParam(required = false) String priority,
             @RequestParam(required = false) String category) {
         return ticketService.getAllTickets(status, priority, category);
+    }
+
+    @GetMapping("/paged")
+    public Page<TicketResponse> getTicketsPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction) {
+        return ticketService.getTicketsPaged(page, size, sortBy, direction);
     }
 
     @GetMapping("/{id}")

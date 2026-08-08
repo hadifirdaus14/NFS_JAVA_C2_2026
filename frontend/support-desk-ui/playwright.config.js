@@ -10,8 +10,10 @@ export default defineConfig({
     baseURL: 'http://localhost:5173',
     trace: 'on-first-retry'
   },
+  // Playwright starts the Vite dev server for us. The Spring Boot backend
+  // must already be running separately (the tests hit the real API).
   webServer: {
-    command: 'npm run dev -- --host 127.0.0.1',
+    command: 'npm run dev',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI
   },
@@ -19,6 +21,6 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] }
-    },
+    }
   ]
 });

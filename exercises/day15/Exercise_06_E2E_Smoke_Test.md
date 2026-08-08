@@ -15,7 +15,7 @@ npm install -D @playwright/test
 npx playwright install
 ```
 
-## Files to add
+## Files to add:
 
 ```text
 frontend/playwright.config.js

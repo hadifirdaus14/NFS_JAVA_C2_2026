@@ -43,6 +43,18 @@ describe('validateTicketFormStep - step 1', () => {
 
         expect(errors).toEqual({});
     });
+
+    it('reports the required fields instead of crashing when the values are missing', () => {
+        // The component always supplies every field, but the utility is public and
+        // must not throw if a caller passes an incomplete object.
+        const errors = validateTicketFormStep({}, 1, false);
+
+        expect(errors).toEqual({
+            title: 'Ticket title is required.',
+            description: 'Ticket description is required.',
+            category: 'Ticket category is required.'
+        });
+    });
 });
 
 describe('validateTicketFormStep - step 2', () => {
@@ -88,8 +100,11 @@ describe('validateTicketFormStep - step 3', () => {
 });
 
 describe('isTicketFormStepValid', () => {
-    it('is false when the step has errors and true when it does not', () => {
+    it('blocks a step that still has errors', () => {
         expect(isTicketFormStepValid({ ...validForm, title: '' }, 1, false)).toBe(false);
+    });
+
+    it('allows a step once every rule passes', () => {
         expect(isTicketFormStepValid(validForm, 1, false)).toBe(true);
     });
 });
@@ -127,6 +142,19 @@ describe('normalizeTicketFormPayload', () => {
             category: 'Hardware',
             priority: 'HIGH',
             status: 'OPEN',
+            assignedTo: null
+        });
+    });
+
+    it('returns empty text instead of crashing when the values are missing', () => {
+        const payload = normalizeTicketFormPayload({});
+
+        expect(payload).toEqual({
+            title: '',
+            description: '',
+            category: '',
+            priority: undefined,
+            status: undefined,
             assignedTo: null
         });
     });

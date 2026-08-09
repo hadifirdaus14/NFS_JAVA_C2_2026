@@ -18,7 +18,9 @@ export default function TicketSummaryCards({ tickets }) {
 
 function SummaryCards({ label, value }) {
     return (
-        <article className="summary-card">
+        // aria-label names the card so a test can ask for "the OPEN card" and read
+        // the number inside it, instead of searching the whole summary for a digit.
+        <article className="summary-card" aria-label={label}>
             <p>{label}</p>
             <strong>{value}</strong>
         </article>

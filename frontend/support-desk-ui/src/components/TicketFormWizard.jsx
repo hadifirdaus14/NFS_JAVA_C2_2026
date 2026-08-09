@@ -2,9 +2,13 @@ import { useRef, useState } from 'react';
 import FormStepIndicator from './FormStepIndicator.jsx';
 import InlineFieldError from './InlineFieldError.jsx';
 import ErrorMessage from './ErrorMessage.jsx';
-
-const STATUS_OPTIONS = ['OPEN', 'IN_PROGRESS', 'CLOSED'];
-const PRIORITY_OPTIONS = ['LOW', 'MEDIUM', 'HIGH'];
+import {
+    TICKET_PRIORITY_OPTIONS as PRIORITY_OPTIONS,
+    TICKET_STATUS_OPTIONS as STATUS_OPTIONS,
+    formatTicketFormLabel,
+    normalizeTicketFormPayload,
+    validateTicketFormStep
+} from '../utils/ticketFormValidation.js';
 
 export const emptyTicketForm = {
   title: '',
@@ -43,43 +47,10 @@ export default function TicketFormWizard({
     }
 
     function validateStep(stepToValidate) {
-        const errors = {};
-
-        if (stepToValidate === 1) {
-            // ...checks that add to errors
-
-            if(!formValues.title.trim()){
-                errors.title = 'Ticket title is required.';
-            }
-
-            if(!formValues.description.trim()){
-                errors.description = 'Ticket description is required.';
-            }
-
-            if(!formValues.category.trim()){
-                errors.category = 'Ticket category is required.';
-            }
-        }
-        if (stepToValidate === 2) {
-            // ...
-
-            if(!PRIORITY_OPTIONS.includes(formValues.priority)){
-                errors.priority = 'Choose a valid priority';
-            }
-
-            if(!STATUS_OPTIONS.includes(formValues.status)){
-                errors.status = 'Choose a valid status';
-            }
-
-            if (formValues.assignedTo.trim() && !formValues.assignedTo.includes('@')) {
-                errors.assignedTo = 'Assigned user should look like an email address.';
-            }
-
-        }
-        if (stepToValidate === 3 && !reviewCheckboxRef.current?.checked) {
-            // ...
-            errors.review = 'Please confirm that you reviewed the ticket details.';
-        }
+        // The rules themselves now live in utils/ticketFormValidation.js.
+        // This function only connects them to React state.
+        const reviewConfirmed = Boolean(reviewCheckboxRef.current?.checked);
+        const errors = validateTicketFormStep(formValues, stepToValidate, reviewConfirmed);
 
         setFieldErrors(errors);
         return Object.keys(errors).length === 0;   // true = no errors = OK to proceed
@@ -109,14 +80,7 @@ export default function TicketFormWizard({
         }
 
         // Build a clean payload: trim text, and send null when assignedTo is blank
-        const payload = {
-            title: formValues.title.trim(),
-            description: formValues.description.trim(),
-            category: formValues.category.trim(),
-            priority: formValues.priority,
-            status: formValues.status,
-            assignedTo: formValues.assignedTo.trim() || null
-        };
+        const payload = normalizeTicketFormPayload(formValues);
 
         // The wizard doesn't call the API itself — it hands data to the parent page
         await onSubmit(payload);
@@ -218,7 +182,7 @@ export default function TicketFormWizard({
                     <div className="review-grid">
                         {Object.entries(formValues).map(([key, value]) => (
                             <div key={key} className="info-item">
-                                <span>{key}</span>
+                                <span>{formatTicketFormLabel(key)}</span>
                                 <strong>{value || 'Not set'}</strong>
                             </div>
                         ))}

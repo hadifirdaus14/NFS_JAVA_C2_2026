@@ -43,4 +43,47 @@ describe('TicketFormWizard', () => {
             assignedTo: null
         });
     });
+
+    it('submits edited values in edit mode', async () => {
+        const user = userEvent.setup();
+        const onSubmit = vi.fn();
+
+        render(
+            <TicketFormWizard
+                mode="edit"
+                initialValues={{
+                    title: 'Existing ticket',
+                    description: 'Loaded from the backend.',
+                    category: 'Hardware',
+                    status: 'IN_PROGRESS',
+                    priority: 'MEDIUM',
+                    assignedTo: 'agent@example.com'
+                }}
+                onSubmit={onSubmit}
+            />
+        );
+
+        // Step 1 - the loaded values are shown, and we change the title
+        expect(screen.getByLabelText('Title')).toHaveValue('Existing ticket');
+        await user.clear(screen.getByLabelText('Title'));
+        await user.type(screen.getByLabelText('Title'), 'Existing ticket updated');
+        await user.click(screen.getByRole('button', { name: 'Continue' }));
+
+        // Step 2 - the loaded classification is kept
+        expect(screen.getByLabelText('Status')).toHaveValue('IN_PROGRESS');
+        await user.click(screen.getByRole('button', { name: 'Continue' }));
+
+        // Step 3 - edit mode shows "Update Ticket" instead of "Create Ticket"
+        await user.click(screen.getByLabelText('I have reviewed the ticket details and they are ready to submit.'));
+        await user.click(screen.getByRole('button', { name: 'Update Ticket' }));
+
+        expect(onSubmit).toHaveBeenCalledWith({
+            title: 'Existing ticket updated',
+            description: 'Loaded from the backend.',
+            category: 'Hardware',
+            priority: 'MEDIUM',
+            status: 'IN_PROGRESS',
+            assignedTo: 'agent@example.com'
+        });
+    });
 });

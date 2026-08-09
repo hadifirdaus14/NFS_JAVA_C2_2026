@@ -1,0 +1,177 @@
+### Day 16 Exercise 2: TicketService refactor evidence
+### Run Spring Boot first: ./mvnw spring-boot:run
+### Every request below was run twice: once on the original TicketService and once on the
+### refactored one. The status code and message were identical both times.
+###
+### NOTE: requests 6, 7 and 10 return 500, not 400/409. That is a pre-existing gap in
+### GlobalExceptionHandler (it has no @ExceptionHandler for InvalidRequestException or
+### DuplicateResourceException). This exercise did not change it, because changing it would
+### change API behaviour instead of only the internal structure.
+
+### 1. Login as seeded admin
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "Admin@12345"
+}
+
+
+### Copy token from the login response
+@token = PASTE_ADMIN_TOKEN_HERE
+
+
+### 2. Create ticket - observed 201, status defaults to OPEN
+POST http://localhost:8080/api/v1/tickets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Day 16 Refactor Check",
+  "description": "Ticket created to prove the refactor did not change create behaviour",
+  "category": "Software",
+  "priority": "HIGH",
+  "createdBy": "admin@example.com"
+}
+
+
+### 3. Read the ticket back, uses findTicketOrThrow - observed 200
+GET http://localhost:8080/api/v1/tickets/PASTE_TICKET_ID_HERE
+Authorization: Bearer {{token}}
+
+
+### 4. Update ticket - observed 200 with the new title, priority and status
+PUT http://localhost:8080/api/v1/tickets/PASTE_TICKET_ID_HERE
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Day 16 Refactor Check Updated",
+  "description": "Updated through the refactored updateTicket method",
+  "category": "Software",
+  "priority": "LOW",
+  "status": "IN_PROGRESS"
+}
+
+
+### 5. Update with surrounding spaces - observed 200, values stored trimmed
+PUT http://localhost:8080/api/v1/tickets/PASTE_TICKET_ID_HERE
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "   Day 16 Refactor Check Updated   ",
+  "description": "   Trimming still happens inside normalizeRequired   ",
+  "category": "   Software   ",
+  "priority": "   MEDIUM   ",
+  "status": "   CLOSED   "
+}
+
+
+### 6. Error path - invalid status
+### Observed 500, message: Invalid status: BROKEN. Allowed statuses are: [OPEN, IN_PROGRESS, CLOSED]
+PUT http://localhost:8080/api/v1/tickets/PASTE_TICKET_ID_HERE
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Day 16 Refactor Check Updated",
+  "description": "Invalid status should still be rejected",
+  "category": "Software",
+  "priority": "LOW",
+  "status": "BROKEN"
+}
+
+
+### 7. Error path - invalid priority
+### Observed 500, message: Invalid priority: URGENT. Allowed priorities are: [LOW, MEDIUM, HIGH]
+PUT http://localhost:8080/api/v1/tickets/PASTE_TICKET_ID_HERE
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Day 16 Refactor Check Updated",
+  "description": "Invalid priority should still be rejected",
+  "category": "Software",
+  "priority": "URGENT",
+  "status": "OPEN"
+}
+
+
+### 7b. Error path - status AND priority invalid
+### Observed 500 and the message must mention STATUS, proving status is still checked first
+PUT http://localhost:8080/api/v1/tickets/PASTE_TICKET_ID_HERE
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Day 16 Refactor Check Updated",
+  "description": "Status is validated before priority",
+  "category": "Software",
+  "priority": "URGENT",
+  "status": "BROKEN"
+}
+
+
+### 8. Error path - unknown id on update - observed 404
+PUT http://localhost:8080/api/v1/tickets/000000000000000000000000
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Missing Ticket",
+  "description": "Unknown id should still return not found",
+  "category": "Software",
+  "priority": "LOW",
+  "status": "OPEN"
+}
+
+
+### 9. Error path - unknown id on GET - observed 404 (same findTicketOrThrow helper)
+GET http://localhost:8080/api/v1/tickets/000000000000000000000000
+Authorization: Bearer {{token}}
+
+
+### 10. Error path - duplicate title
+### Observed 500, message: Ticket title already exists: Cannot access email
+PUT http://localhost:8080/api/v1/tickets/PASTE_TICKET_ID_HERE
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Cannot access email",
+  "description": "Duplicate title should still be rejected",
+  "category": "Software",
+  "priority": "LOW",
+  "status": "OPEN"
+}
+
+
+### 11. Error path - blank title, bean validation - observed 400
+PUT http://localhost:8080/api/v1/tickets/PASTE_TICKET_ID_HERE
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "",
+  "description": "Blank title should fail @NotBlank",
+  "category": "Software",
+  "priority": "LOW",
+  "status": "OPEN"
+}
+
+
+### 12. Filters still work - hasText helper replaced the repeated null/blank checks
+GET http://localhost:8080/api/v1/tickets?status=OPEN
+Authorization: Bearer {{token}}
+
+
+### 13. Blank filter is ignored, same as before - observed 200 with the full list
+GET http://localhost:8080/api/v1/tickets?status=
+Authorization: Bearer {{token}}
+
+
+### 14. Paged list unchanged - observed 200 with the same page metadata
+GET http://localhost:8080/api/v1/tickets/paged?page=0&size=3&sortBy=createdAt&direction=desc
+Authorization: Bearer {{token}}

@@ -49,11 +49,11 @@ public class TicketService {
         List<Ticket> tickets;
 
         // Check which filter was provided and call the matching repository method
-        if (status != null && !status.trim().isEmpty()) {
+        if (hasText(status)) {
             tickets = ticketRepository.findByStatusIgnoreCase(status);
-        } else if (priority != null && !priority.trim().isEmpty()) {
+        } else if (hasText(priority)) {
             tickets = ticketRepository.findByPriorityIgnoreCase(priority);
-        } else if (category != null && !category.trim().isEmpty()) {
+        } else if (hasText(category)) {
             tickets = ticketRepository.findByCategoryIgnoreCase(category);
         } else {
             // If no filters are provided, return everything
@@ -84,9 +84,8 @@ public class TicketService {
 
     public TicketResponse getTicketById(String id) {
         // Search MongoDB by ID, throw exception if not found
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket " + id + " was not found"));
-                
+        Ticket ticket = findTicketOrThrow(id);
+
         // Return the DTO
         return mapToResponse(ticket);
     }
@@ -112,23 +111,19 @@ public class TicketService {
     public TicketResponse updateTicket(String id, UpdateTicketRequest request){
         logger.info("Updating ticket with id={}", id);
 
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket " + id + " was not found"));
+        Ticket ticket = findTicketOrThrow(id);
 
-        String title = request.getTitle().trim();
-        String priority = request.getPriority().trim();
-        String status = request.getStatus().trim();
+        // Clean the incoming values first, then check the ones that have allowed values.
+        // The order matters: status is checked before priority, same as before the refactor.
+        String title = normalizeRequired(request.getTitle());
+        String status = normalizeStatus(request.getStatus());
+        String priority = normalizePriority(request.getPriority());
 
-        validateStatus(status);
-        validatePriority(priority);
-
-        if(!ticket.getTitle().equalsIgnoreCase(title) && ticketRepository.existsByTitle(title)) {
-            throw new DuplicateResourceException("Ticket title already exists: " + title);
-        }
+        ensureTitleIsUniqueForUpdate(ticket, title);
 
         ticket.setTitle(title);
-        ticket.setCategory(request.getCategory().trim());
-        ticket.setDescription(request.getDescription().trim());
+        ticket.setCategory(normalizeRequired(request.getCategory()));
+        ticket.setDescription(normalizeRequired(request.getDescription()));
         ticket.setPriority(priority);
         ticket.setStatus(status);
 
@@ -136,15 +131,50 @@ public class TicketService {
         return mapToResponse(updatedTicket);
     }
 
-    private void validateStatus(String status) {
-        if (!ALLOWED_STATUSES.contains(status)) {
-            throw new InvalidRequestException("Invalid status: " + status + ". Allowed statuses are: " + ALLOWED_STATUSES);
-        }
+    // ----- Private helper methods -----
+
+    // Looks up one ticket, or stops the request with a 404 style error
+    private Ticket findTicketOrThrow(String id) {
+        return ticketRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket " + id + " was not found"));
     }
 
-    private void validatePriority(String priority) {
-        if (!ALLOWED_PRIORITIES.contains(priority)) {
-            throw new InvalidRequestException("Invalid priority: " + priority + ". Allowed priorities are: " + ALLOWED_PRIORITIES);
+    // True when a filter value was actually provided by the caller
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
+    // Removes the spaces around a required text value
+    private String normalizeRequired(String value) {
+        return value == null ? null : value.trim();
+    }
+
+    // Cleans the status and makes sure it is one we allow
+    private String normalizeStatus(String status) {
+        String cleanStatus = normalizeRequired(status);
+
+        if (!ALLOWED_STATUSES.contains(cleanStatus)) {
+            throw new InvalidRequestException("Invalid status: " + cleanStatus + ". Allowed statuses are: " + ALLOWED_STATUSES);
+        }
+
+        return cleanStatus;
+    }
+
+    // Cleans the priority and makes sure it is one we allow
+    private String normalizePriority(String priority) {
+        String cleanPriority = normalizeRequired(priority);
+
+        if (!ALLOWED_PRIORITIES.contains(cleanPriority)) {
+            throw new InvalidRequestException("Invalid priority: " + cleanPriority + ". Allowed priorities are: " + ALLOWED_PRIORITIES);
+        }
+
+        return cleanPriority;
+    }
+
+    // A ticket may keep its own title, but it may not take a title another ticket already uses
+    private void ensureTitleIsUniqueForUpdate(Ticket ticket, String title) {
+        if (!ticket.getTitle().equalsIgnoreCase(title) && ticketRepository.existsByTitle(title)) {
+            throw new DuplicateResourceException("Ticket title already exists: " + title);
         }
     }
 

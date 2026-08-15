@@ -22,6 +22,13 @@ Do not use sanitisation to hide invalid input. Some input should still be reject
 Answer:
 
 1. What is validation?
+it is deciding whether the input is allowed and rejecting it with error if its not. 
+
 2. What is sanitisation?
+it is tidying input into a consistent shape before storing it
+
 3. Give one example where input should be cleaned.
+when the input came with trailing whitespace and newline.
+
 4. Give one example where input should be rejected.
+when the input is completely different from our intended answer

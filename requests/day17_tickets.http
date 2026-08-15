@@ -1,0 +1,24 @@
+### Day 17 - Health check
+GET http://localhost:8080/api/health
+
+### Day 17 - Readiness check
+GET http://localhost:8080/api/readiness
+
+###declare baseUrl and auth_token variables
+
+@baseUrl = http://localhost:8080
+@auth_token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJBRE1JTiIsImlzcyI6ImFzc2V0LXRyYWNrZXItYXBpIiwibmFtZSI6IkFkbWluIFVzZXIiLCJleHAiOjE3ODY3NjYyODgsImlhdCI6MTc4Njc2MjY4OCwidXNlcklkIjoiNmE1YjFmYzY0ZGVkNjFjNDI1NDc2Y2YxIn0.V-uo58wmKemShJ5x10K0mQAm4HYL5e1_BjNd3rWHCbo
+
+### Day 17 - Login to confirm backend still works
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "Admin@12345"
+}
+
+### Get Ticket Status Report
+GET {{baseUrl}}/api/v1/reports/tickets-by-status
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}

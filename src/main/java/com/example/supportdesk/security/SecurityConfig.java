@@ -50,6 +50,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public Endpoints
                         .requestMatchers("/api/health", "/error").permitAll()
+                        .requestMatchers("/api/readiness").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/docs/**").permitAll()
                         .requestMatchers("/api/v1/info").permitAll()

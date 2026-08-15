@@ -56,15 +56,22 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/info").permitAll()
 
                         // Protected Ticket Endpoints
+                        // Reading is open to any signed-in role. Anything that CHANGES a
+                        // ticket is ADMIN only, which is what the UI already assumes.
                         .requestMatchers(HttpMethod.GET, "/api/tickets", "/api/tickets/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/tickets").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/tickets/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/tickets/**").hasRole("ADMIN")
 
                         // Protected Ticket V1 Endpoints
                         .requestMatchers(HttpMethod.GET, "/api/v1/tickets", "/api/v1/tickets/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/tickets").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/tickets").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/tickets/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/tickets/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/reports/**").hasAnyRole("USER", "ADMIN")
-                        
-                        // Fallback
+
+                        // Fallback. Anything not listed above still needs a valid token,
+                        // but do not rely on this for write endpoints - list them explicitly.
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

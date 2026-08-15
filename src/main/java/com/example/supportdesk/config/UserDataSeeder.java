@@ -25,6 +25,15 @@ public class UserDataSeeder {
                     "Admin@12345",
                     "ADMIN"
             );
+
+            createUserIfMissing(
+                    appUserRepository,
+                    passwordEncoder,
+                    "User",
+                    "user@example.com",
+                    "User@12345",
+                    "USER"
+            );
         };
     }
 

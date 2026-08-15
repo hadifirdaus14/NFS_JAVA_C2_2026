@@ -1,16 +1,21 @@
-### Day 17 - Health check
-GET http://localhost:8080/api/health
-
-### Day 17 - Readiness check
-GET http://localhost:8080/api/readiness
-
-###declare baseUrl and auth_token variables
+### Day 17 - Support Desk endpoints
+### Run Spring Boot first: ./mvnw spring-boot:run
 
 @baseUrl = http://localhost:8080
-@auth_token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJBRE1JTiIsImlzcyI6ImFzc2V0LXRyYWNrZXItYXBpIiwibmFtZSI6IkFkbWluIFVzZXIiLCJleHAiOjE3ODY3NjYyODgsImlhdCI6MTc4Njc2MjY4OCwidXNlcklkIjoiNmE1YjFmYzY0ZGVkNjFjNDI1NDc2Y2YxIn0.V-uo58wmKemShJ5x10K0mQAm4HYL5e1_BjNd3rWHCbo
 
-### Day 17 - Login to confirm backend still works
-POST http://localhost:8080/api/auth/login
+### Health check (public)
+GET {{baseUrl}}/api/health
+
+### Readiness check (public) - Exercise 2
+GET {{baseUrl}}/api/readiness
+
+
+###############################################################
+# 1. LOGIN - run these two first, then paste the tokens below
+###############################################################
+
+### Login as ADMIN
+POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
@@ -18,7 +23,165 @@ Content-Type: application/json
   "password": "Admin@12345"
 }
 
-### Get Ticket Status Report
-GET {{baseUrl}}/api/v1/reports/tickets-by-status
+### Login as NORMAL USER
+POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
-Authorization: Bearer {{auth_token}}
+
+{
+  "email": "user@example.com",
+  "password": "User@12345"
+}
+
+
+### Paste the tokens from the two responses above.
+### They expire after 60 minutes, so re-login and re-paste when you start getting 401s.
+@adminToken = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJBRE1JTiIsImlzcyI6ImFzc2V0LXRyYWNrZXItYXBpIiwibmFtZSI6IkFkbWluIFVzZXIiLCJleHAiOjE3ODY3NzAwODMsImlhdCI6MTc4Njc2NjQ4MywidXNlcklkIjoiNmE1YjFmYzY0ZGVkNjFjNDI1NDc2Y2YxIn0.aX1qiHpwE1Airua-RKOsGnq_QsPvGWdse5d8IqXkIv8
+@userToken = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwicm9sZSI6IlVTRVIiLCJpc3MiOiJhc3NldC10cmFja2VyLWFwaSIsIm5hbWUiOiJOb3JtYWwgVXNlciIsImV4cCI6MTc4Njc3MDA2MSwiaWF0IjoxNzg2NzY2NDYxLCJ1c2VySWQiOiI2YTViMjBiZGFiNTQ4ZTM5MzBmZDYzYjcifQ.mEJ-vuHl_73HT4D60-bC7KdIODl85WG_uMWIQICz3es
+
+
+###############################################################
+# 2. HAPPY PATH - confirm things still work
+###############################################################
+
+### List tickets as ADMIN -> 200
+GET {{baseUrl}}/api/v1/tickets
+Authorization: Bearer {{adminToken}}
+
+### List tickets as USER -> 200 (reading is allowed for both roles)
+GET {{baseUrl}}/api/v1/tickets
+Authorization: Bearer {{userToken}}
+
+### Ticket status report as USER -> 200
+GET {{baseUrl}}/api/v1/reports/tickets-by-status
+Authorization: Bearer {{userToken}}
+
+### Create a ticket as ADMIN -> 201
+### Copy the "id" from the response into @ticketId below.
+POST {{baseUrl}}/api/v1/tickets
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "title": "Day 17 error tracking ticket",
+  "description": "Used to trigger the error cases below.",
+  "category": "Testing",
+  "priority": "LOW",
+  "createdBy": "admin@example.com"
+}
+
+@ticketId = PASTE_TICKET_ID_HERE
+
+
+###############################################################
+# 3. EXERCISE 3 - the five errors to document
+###############################################################
+
+### ---- 401 Unauthorized: no token at all ----
+GET {{baseUrl}}/api/v1/tickets
+
+### ---- 401 Unauthorized: a token that is not valid ----
+GET {{baseUrl}}/api/v1/tickets
+Authorization: Bearer not.a.real.token
+
+
+### ---- 403 Forbidden: USER tries to CREATE a ticket ----
+### Reading is allowed for USER, changing is ADMIN only.
+POST {{baseUrl}}/api/v1/tickets
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "title": "Ticket created by a normal user",
+  "description": "A USER role should not be allowed to do this.",
+  "category": "Testing",
+  "priority": "LOW",
+  "createdBy": "user@example.com"
+}
+
+### ---- 403 Forbidden: USER tries to UPDATE a ticket ----
+PUT {{baseUrl}}/api/v1/tickets/{{ticketId}}
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "title": "Edited by a normal user",
+  "description": "A USER role should not be allowed to do this either.",
+  "category": "Testing",
+  "priority": "HIGH",
+  "status": "CLOSED"
+}
+
+
+### ---- 400 Bad Request: blank required field (@NotBlank) ----
+PUT {{baseUrl}}/api/v1/tickets/{{ticketId}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "title": "",
+  "description": "Title is blank so bean validation rejects the request.",
+  "category": "Testing",
+  "priority": "LOW",
+  "status": "OPEN"
+}
+
+
+### ---- 404 Not Found: ticket id that does not exist ----
+GET {{baseUrl}}/api/v1/tickets/000000000000000000000000
+Authorization: Bearer {{adminToken}}
+
+### ---- 404 Not Found: updating an id that does not exist ----
+PUT {{baseUrl}}/api/v1/tickets/000000000000000000000000
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "title": "Ticket that is not there",
+  "description": "Should not be found.",
+  "category": "Testing",
+  "priority": "LOW",
+  "status": "OPEN"
+}
+
+
+### ---- 409 Conflict: rename a ticket to a title another ticket already uses ----
+### Handled by GlobalExceptionHandler.handleDuplicateResource
+### -> {"errors": [], "message": "Ticket title already exists: Cannot access email"}
+PUT {{baseUrl}}/api/v1/tickets/6a6d91e979f4f37bef242422
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "title": "Laptop will not power on",
+  "description": "This title already belongs to a seeded ticket.",
+  "category": "Testing",
+  "priority": "LOW",
+  "status": "OPEN"
+}
+
+
+### ---- 400 Bad Request: invalid status (a business rule, not bean validation) ----
+### Handled by GlobalExceptionHandler.handleInvalidRequest
+### -> {"errors": [], "message": "Invalid status: BROKEN. Allowed statuses are: [...]"}
+PUT {{baseUrl}}/api/v1/tickets/{{ticketId}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "title": "Day 17 error tracking ticket",
+  "description": "BROKEN is not an allowed status.",
+  "category": "Testing",
+  "priority": "LOW",
+  "status": "BROKEN"
+}
+
+
+###############################################################
+# 4. Finding the errors in the logs
+###############################################################
+# Every request above prints one line from RequestTimingFilter, for example:
+#
+#   requestId=48d717cf method=PUT path=/api/v1/tickets/6a7f... status=403 durationMs=4
+#
+# The response also carries an X-Request-Id header with the same value,
+# so you can match a response you saw in the client to its line in the log.

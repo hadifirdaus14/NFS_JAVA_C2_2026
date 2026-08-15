@@ -35,4 +35,20 @@ public class GlobalExceptionHandler {
 
         return new ApiErrorResponse("Validation failed", fieldErrors);
     }
+
+    // A value broke a business rule, for example a status outside the allowed list.
+    // Without this handler the exception escaped and Spring returned 500.
+    @ExceptionHandler(InvalidRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiErrorResponse handleInvalidRequest(InvalidRequestException exception) {
+        return new ApiErrorResponse(exception.getMessage());
+    }
+
+    // The request was well formed, but it clashes with something already stored,
+    // for example a ticket title another ticket is already using. 409, not 500.
+    @ExceptionHandler(DuplicateResourceException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiErrorResponse handleDuplicateResource(DuplicateResourceException exception) {
+        return new ApiErrorResponse(exception.getMessage());
+    }
 }
